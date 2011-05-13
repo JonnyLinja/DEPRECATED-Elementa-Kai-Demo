@@ -2,6 +2,7 @@ INSTALLING AND RUNNING
 =====
 
 If you wish to run this code, you will need to:
+
 1. Make a PlayerIO account and follow their setup instructions
 2. Replace their Game.cs with the Game.cs located inside this repo
 3. Put your own game id inside Net.as
