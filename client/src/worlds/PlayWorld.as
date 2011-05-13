@@ -1,4 +1,6 @@
 package worlds {
+	import flash.events.Event;
+	
 	import playerio.Message;
 	
 	import flashpunk.utils.Input;
@@ -39,6 +41,7 @@ package worlds {
 		//boolean checks
 		private var isP1:Boolean;
 		private var shouldRender:Boolean = true;
+		private var lostWindowFocus:Boolean = false;
 		
 		//my inputs
 		private var a:Boolean = false;
@@ -53,6 +56,10 @@ package worlds {
 			
 			//message handler
 			Net.conn.addMessageHandler(Net.messageCommands, receiveEnemyCommands);
+			
+			//window focus
+			FP.stage.addEventListener(Event.ACTIVATE, function():void { lostWindowFocus = true; } );
+			FP.stage.addEventListener(Event.DEACTIVATE, function():void { Input.clear(); } );
 		}
 		
 		/**
@@ -327,28 +334,57 @@ package worlds {
 			if (!shouldRender)
 				return;
 			
-			//left
-			if(Input.check(Key.A) != a) {
-				a = !a;
-				addMyCommand(new Command(isP1, Command.A, perceivedFrame+frameDelay));
-			}
-			
-			//right
-			if(Input.check(Key.D) != d) {
-				d = !d;
-				addMyCommand(new Command(isP1, Command.D, perceivedFrame + frameDelay));
-			}
-			
-			//up
-			if(Input.check(Key.W) != w) {
-				w = !w;
-				addMyCommand(new Command(isP1, Command.W, perceivedFrame+frameDelay));
-			}
-			
-			//down
-			if(Input.check(Key.S) != s) {
-				s = !s;
-				addMyCommand(new Command(isP1, Command.S, perceivedFrame+frameDelay));
+			if (lostWindowFocus) {
+				//left
+				if (a) {
+					a = false;
+					addMyCommand(new Command(isP1, Command.A, perceivedFrame+frameDelay));
+				}
+				
+				//right
+				if (d) {
+					d = false;
+					addMyCommand(new Command(isP1, Command.D, perceivedFrame+frameDelay));
+				}
+				
+				//up
+				if (w) {
+					w = false;
+					addMyCommand(new Command(isP1, Command.W, perceivedFrame+frameDelay));
+				}
+				
+				//down
+				if (s) {
+					s = false;
+					addMyCommand(new Command(isP1, Command.S, perceivedFrame+frameDelay));
+				}
+				
+				//reset
+				lostWindowFocus = false;
+			}else {
+				//left
+				if(Input.check(Key.A) != a) {
+					a = !a;
+					addMyCommand(new Command(isP1, Command.A, perceivedFrame+frameDelay));
+				}
+				
+				//right
+				if(Input.check(Key.D) != d) {
+					d = !d;
+					addMyCommand(new Command(isP1, Command.D, perceivedFrame + frameDelay));
+				}
+				
+				//up
+				if(Input.check(Key.W) != w) {
+					w = !w;
+					addMyCommand(new Command(isP1, Command.W, perceivedFrame+frameDelay));
+				}
+				
+				//down
+				if(Input.check(Key.S) != s) {
+					s = !s;
+					addMyCommand(new Command(isP1, Command.S, perceivedFrame+frameDelay));
+				}
 			}
 			
 			//send message
