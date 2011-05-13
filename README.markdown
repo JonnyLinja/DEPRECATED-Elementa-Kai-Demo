@@ -63,7 +63,7 @@ When an opponent's command is received, the true state is updated to the receive
 4. Command is sent through PlayerIO to player2
 5. Changes due to command are rendered
 
-># ### Player2 Side
+> #### Player2 Side
 
 1. Player2 receives the command
 2. Command is stored in the datastructure
