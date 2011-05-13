@@ -32,8 +32,9 @@ package worlds {
 		private const frameRate:uint = 20; //50 fps
 		private const frameDelay:uint = 3; //how many frames to delay inputs by - has to be at least 1!
 		private var trueFrame:uint = 0; //current frame of true
-		private var trueMaxFrame:uint = 0; //maximum received true frame
 		private var perceivedFrame:uint = 0; //current frame of perceived
+		private var lastEnemyFrame:uint = 0; //last frame received by enemy
+		private var lastMyFrame:uint = 0; //last frame inputted by player
 		
 		//time
 		private var nextFrameTime:uint = 0; //for perceived
@@ -123,7 +124,8 @@ package worlds {
 				m = Net.conn.createMessage(Net.messageCommands);
 				
 				//frame
-				m.add(c.frame);
+				m.add(c.frame-lastMyFrame);
+				lastMyFrame = c.frame;
 				
 				//mouse
 				//m.add(Input.mouseX);
@@ -147,19 +149,19 @@ package worlds {
 			//var mouseY:int = m.getInt(2);
 			
 			//increment true max
-			trueMaxFrame = m.getUInt(0);
+			lastEnemyFrame += m.getUInt(0);
 			
-			Utils.log("frame difference is " + (perceivedFrame - trueMaxFrame));
+			Utils.log("frame difference is " + (perceivedFrame - lastEnemyFrame));
 			
 			//loop insert new command
-			for (var pos:int=1; pos<length; pos++) {
+			for (var pos:int=/*3*/1; pos<length; pos++) {
 				c = m.getInt(pos);
 				switch(c) {
 					case Command.W:
 					case Command.A:
 					case Command.S:
 					case Command.D:
-						insertCommand(new Command(!isP1, c, trueMaxFrame, false));
+						insertCommand(new Command(!isP1, c, lastEnemyFrame, false));
 				}
 			}
 		}
@@ -180,7 +182,7 @@ package worlds {
 		 */
 		private function updateTrueWorld():void {
 			//determine frame to loop to
-			var leastFrame:Number = Utils.least(trueMaxFrame, perceivedFrame);
+			var leastFrame:Number = Utils.least(lastEnemyFrame, perceivedFrame);
 			
 			//should render
 			if(trueFrame <= leastFrame)
@@ -278,14 +280,6 @@ package worlds {
 			else
 				return;
 			
-			/*
-			//send message
-			if (m) {
-				Net.conn.sendMessage(m);
-				m = null;
-			}
-			*/
-			
 			//declare variables
 			var commandToCheck:Command;
 			
@@ -371,7 +365,7 @@ package worlds {
 				//right
 				if(Input.check(Key.D) != d) {
 					d = !d;
-					addMyCommand(new Command(isP1, Command.D, perceivedFrame + frameDelay));
+					addMyCommand(new Command(isP1, Command.D, perceivedFrame+frameDelay));
 				}
 				
 				//up
