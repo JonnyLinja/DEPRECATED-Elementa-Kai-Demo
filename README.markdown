@@ -49,9 +49,8 @@ Commands are stored in a datastructure in the order of frames.
 
 There are two versions of the game state running simultaneously.
 
-The true state is completely accurate and always behind in terms of time. In other words, the data is old but reliable. It runs silently in the background.
-
-The perceived state is up to date in terms of time but never guaranteed to be accurate. This is what is displayed to the user. It is used as a form of latency hiding.
+1. The true state is completely accurate and always behind in terms of time. In other words, the data is old but reliable. It runs silently in the background.
+2. The perceived state is up to date in terms of time but never guaranteed to be accurate. This is what is displayed to the user. It is used as a form of latency hiding.
 
 When an opponent's command is received, the true state is updated to the received frame. This is done because the game knows that everything before a received opponent frame is definite and accurate. The perceived state is then rolled back to the true state to accomodate the new changes. It is then updated to the current frame.
 
