@@ -4,6 +4,8 @@ package entities {
 	
 	import flashpunk.Entity;
 	
+	import general.Utils;
+	
 	public class Bender extends MovableEntity {
 		//commands
 		public var moveLeft:Boolean;
@@ -23,10 +25,38 @@ package entities {
 		}
 		
 		override public function preUpdate():void {
+			resetShouldMove();
+			checkCollideBender(AirBender.collisionType);
+			checkCollideBender(FireBender.collisionType);
+			checkCollideBender(EarthBender.collisionType);
+			checkCollideBender(WaterBender.collisionType);
+		}
+		
+		private function resetShouldMove():void {
+			shouldMoveX = 0;
+			shouldMoveY = 0;
+		}
+		
+		protected function checkCollideBender(benderCollisionType:String):void {
+			//should check
+			if (type == benderCollisionType)
+				return;
 			
+			//declare variables
+			var collisionList:Vector.<Entity> = new Vector.<Entity>();
+			
+			//populate vector
+			collideInto(benderCollisionType, x, y, collisionList);
+			
+			//loop through vector
+			for each (var e:MovableEntity in collisionList) {
+				excludeCollide(e, 25, 32);
+			}
 		}
 		
 		override public function update():void {
+			x += shouldMoveX;
+			y += shouldMoveY;
 			updateMovement();
 		}
 		

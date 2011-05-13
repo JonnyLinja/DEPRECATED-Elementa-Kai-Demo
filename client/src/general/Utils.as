@@ -3,16 +3,20 @@ package general {
 	import flash.utils.ByteArray;
 
 	public class Utils {
+		/**
+		 * Deals with floating point precision desyncs
+		 * @param	number
+		 * @param	factor
+		 * @return
+		 */
 		public static function toFixed(number:Number, factor:int):Number {
 			return (Math.round(number * factor)/factor);
 		}
 		
-		public static function toByteArray(value:int):ByteArray {
-			var result:ByteArray = new ByteArray();
-			result.writeByte(value);
-			return result;
-		}
-		
+		/**
+		 * Sends message to JavaScript
+		 * @param	data
+		 */
 		public static function log(data:String):void {
 			//temporary - for logging purposes
 			ExternalInterface.call("log", data.toString());
@@ -28,6 +32,12 @@ package general {
 			if (n1 <= n2)
 				return n1;
 			return n2;
+		}
+		
+		public static function swap(a:Object, b:Object):void {
+			var c:Object = a;
+			a = b;
+			b = c;
 		}
 		
 		public function Utils() {

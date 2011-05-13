@@ -1,6 +1,7 @@
 package entities {
 	import flashpunk.graphics.Spritemap;
 	import flashpunk.FP;
+	import physics.ForceComponent;
 	
 	import general.Utils;
 	
@@ -58,6 +59,48 @@ package entities {
 			//temp animation test
 			sprite_map.add("walkdown", [0, 1, 2], 20, true);
 			sprite_map.play("walkdown");
+		}
+		
+		/**
+		 * Bounce effect
+		 * @param	e
+		 * @param	ratioX
+		 * @param	ratioY
+		 * @return
+		 */
+		override public function excludeCollide(e:MovableEntity, ratioX:int, ratioY:int):int {
+			//declare variables
+			var result:int = super.excludeCollide(e, ratioX, ratioY);
+			
+			//change velocities if moving in proper direction
+			if (result == hitTop) {
+				if (Math.abs(downForce.velocity) < Math.abs(upForce.velocity))
+					bounceVertical();
+			}else if(result == hitBottom) {
+				if (Math.abs(upForce.velocity) < Math.abs(downForce.velocity))
+					bounceVertical();
+			}else if (result == hitLeft) {
+				if (Math.abs(rightForce.velocity) < Math.abs(leftForce.velocity))
+					bounceHorizontal();
+			}else if (result == hitRight) {
+				if (Math.abs(leftForce.velocity) < Math.abs(rightForce.velocity))
+					bounceHorizontal();
+			}
+			
+			//return result
+			return result;
+		}
+		
+		private function bounceVertical():void {
+			var temp:Number = upForce.velocity;
+			upForce.velocity = -downForce.velocity;
+			downForce.velocity = -temp;
+		}
+		
+		private function bounceHorizontal():void {
+			var temp:Number = leftForce.velocity;
+			leftForce.velocity = -rightForce.velocity;
+			rightForce.velocity = -temp;
 		}
 	}
 }
