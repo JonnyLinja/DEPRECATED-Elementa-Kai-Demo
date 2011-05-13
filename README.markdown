@@ -11,17 +11,17 @@ If you wish to run this code, you will need to:
 CLIENT
 =====
 
-### FLASHPUNK ENGINE
+### FlashPunk Engine
 
 The FlashPunk used here is the same fork of the engine as https://github.com/SelfPossessed/FlashPunk. For convenience, the packages were renamed to simply flashpunk as having a net folder was annoying. Debug console code was commented out for speed purposes. Small changes were also made, like making FP.time public to reduce getTimer() calls, making the recycled singly linked list into a doubly linked one, and adding an unrecycled function to allow rollbacks to function properly. These changes may cause frustrations when merging with other forks.
 
 The fork adds rollback capability for Worlds and Entities. However, due to the usage of linked lists and recycling, the order of updates is not guaranteed between different clients. Entity updates are therefore divided into two steps; preUpdate and update. Collision checks are done in preUpdate, after which flags for changes to be made are set. The update function then applies the changes.
 
-### LOGGING
+### Logging
 
 Log information is sent via ExternalInterface to be printed out by JavaScript. This means that you cannot run the code within FlashDevelop. This was done so that debugging between different computers was as simple as copying and pasting the output from a textarea.
 
-### TIMESTEP
+### Timestep
 
 The client runs at a fixed timestep of 20 milliseconds. The max framerate is therefore 50. The fixed timestep makes physics easier and reduces bandwidth (sending frames is cheaper than sending milliseconds) at the cost of slight CPU performance.
 
@@ -35,13 +35,13 @@ The server does not attempt to get two players with vastly different pings to st
 ROLLBACK
 =====
 
-### DATA
+### Data
 
 Command inputs, such as W pressed or W released, and the frames they were executed on are sent between clients immediately. No game state information, such as X,Y positions or physics, are sent. No interpolation is used.
 
 Commands are stored in a datastructure in the order of frames.
 
-### CONCEPT
+### Concept
 
 There are two versions of the game state running simultaneously.
 
@@ -51,7 +51,7 @@ The perceived state is up to date in terms of time but never guaranteed to be ac
 
 When an opponent's command is received, the true state is updated to the received frame. This is done because the game knows that everything before a received opponent frame is definite and accurate. The perceived state is then rolled back to the true state to accomodate the new changes. It is then updated to the current frame.
 
-### EXAMPLE
+### Example
 
 #### Player1 Side
 
@@ -71,6 +71,6 @@ When an opponent's command is received, the true state is updated to the receive
 6. Perceived state is updated to the current time, executing any remaining stored commands
 7. Changes due to the received command are rendered
 
-### PAUSING/SLOWDOWN
+### Pausing/Slowdown
 
 No pausing occurs, even during lag or CPU spikes. The rollback will simply be very sudden and jarring.
