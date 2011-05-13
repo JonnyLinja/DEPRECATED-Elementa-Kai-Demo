@@ -13,7 +13,9 @@ CLIENT
 
 ### FlashPunk Engine
 
-The FlashPunk used here is the same fork of the engine as https://github.com/SelfPossessed/FlashPunk. For convenience, the packages were renamed to simply flashpunk as having a net folder was annoying. Debug console code was commented out for speed purposes. Small changes were also made, like making FP.time public to reduce getTimer() calls, making the recycled singly linked list into a doubly linked one, and adding an unrecycled function to allow rollbacks to function properly. These changes may cause frustrations when merging with other forks.
+The FlashPunk used here is the same fork of the engine as https://github.com/SelfPossessed/FlashPunk.
+
+For convenience, the packages were renamed to simply flashpunk as having a net folder was annoying. Debug console code was commented out for speed purposes. Small changes were also made, like making FP.time public to reduce getTimer() calls, making the recycled singly linked list into a doubly linked one, and adding an unrecycled function to allow rollbacks to function properly. These changes may cause frustrations when merging with other forks.
 
 The fork adds rollback capability for Worlds and Entities. However, due to the usage of linked lists and recycling, the order of updates is not guaranteed between different clients. Entity updates are therefore divided into two steps; preUpdate and update. Collision checks are done in preUpdate, after which flags for changes to be made are set. The update function then applies the changes.
 
@@ -53,7 +55,7 @@ When an opponent's command is received, the true state is updated to the receive
 
 ### Example
 
-#### Player1 Side
+> #### Player1 Side
 
 1. Player1 executes a command
 2. Command is executed locally in the perceived state
@@ -61,7 +63,7 @@ When an opponent's command is received, the true state is updated to the receive
 4. Command is sent through PlayerIO to player2
 5. Changes due to command are rendered
 
-#### Player2 Side
+># ### Player2 Side
 
 1. Player2 receives the command
 2. Command is stored in the datastructure
