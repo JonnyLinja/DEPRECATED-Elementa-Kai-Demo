@@ -25,7 +25,7 @@ package worlds {
 		 * @param	isP1
 		 */
 		public function GameWorld() {
-			player1 = new WaterBender(200, 200);
+			player1 = new FireBender(200, 200);
 			player2 = new AirBender(150, 150);
 			add(player1);
 			add(player2);

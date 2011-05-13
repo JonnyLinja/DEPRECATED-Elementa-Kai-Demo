@@ -1,8 +1,15 @@
 package entities {
 	import flash.geom.Point;
+	
 	import flashpunk.Entity;
+	import flashpunk.FP;
+	
+	import general.Utils;
+	
 	import physics.ForceVector;
 	import physics.WindForceVector;
+	
+	//MAY WANT TO MOVE THIS STUFF TO ENTITY ITSELF
 	
 	public class MovableEntity extends Entity {
 		//constants
@@ -16,7 +23,7 @@ package entities {
 		public var moveForce:ForceVector = new ForceVector();
 		public var windForce:WindForceVector = new WindForceVector();
 		
-		//to move
+		//should
 		public var shouldMoveX:Number;
 		public var shouldMoveY:Number;
 		
@@ -25,19 +32,30 @@ package entities {
 			this.y = y;
 		}
 		
-		private function resetShouldMove():void {
+		protected function resetShouldVariables():void {
 			shouldMoveX = 0;
 			shouldMoveY = 0;
 		}
 		
+		protected function resolveShouldVariables():void {
+			x += shouldMoveX;
+			y += shouldMoveY;
+		}
+		
 		override public function preUpdate():void {
-			resetShouldMove();
 			super.preUpdate();
+			resetShouldVariables();
+			checkClampOnScreen();
+		}
+		
+		override public function update():void {
+			super.update();
+			resolveShouldVariables();
 		}
 		
 		/**
 		 * Moves colliding entities out of the way
-		 * Assumes that entities do collide
+		 * Assumes that entities did collide
 		 * @param	e
 		 * @param	ratioX
 		 * @param	ratioY
@@ -45,7 +63,7 @@ package entities {
 		 * @param	eMovable
 		 * @return
 		 */
-		public function excludeCollide(e:MovableEntity, ratioX:int, ratioY:int):int {
+		protected function checkExcludeCollide(e:MovableEntity, ratioX:int, ratioY:int):int {
 			//declare variables
 			var intersect:Point = getIntersectRect(e);
 			
@@ -80,7 +98,7 @@ package entities {
 		 * @param	e
 		 * @return
 		 */
-		public function getIntersectRect(e:MovableEntity):Point {
+		protected function getIntersectRect(e:MovableEntity):Point {
 			//declare variables
 			var intersectionWidth:Number = 0;
 			var intersectionHeight:Number = 0;
@@ -108,8 +126,24 @@ package entities {
 		 * @param	ratioY
 		 * @return
 		 */
-		public function hitHorizontal(intersect:Point, ratioX:int, ratioY:int):Boolean {
+		protected function hitHorizontal(intersect:Point, ratioX:int, ratioY:int):Boolean {
 			return ((intersect.x / ratioY) <= (intersect.y / ratioX));
+		}
+		
+		protected function checkClampOnScreen():void {
+			if (x < 0)
+				//left
+				shouldMoveX -= x;
+			else if (x + width > FP.width)
+				//right
+				shouldMoveX -= (x + width - FP.width);
+			
+			if (y < 0)
+				//up
+				shouldMoveY -= y;
+			else if (y + height > FP.height)
+				//down
+				shouldMoveY -= (y + height - FP.height);
 		}
 	}
 }

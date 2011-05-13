@@ -23,6 +23,10 @@ package entities {
 		private const accel:Number = .2;
 		private const decel:Number = .1;
 		
+		//bounce
+		private var shouldBounceVertical:Boolean;
+		private var shouldBounceHorizontal:Boolean;
+		
 		public function AirBender(x:Number = 0, y:Number = 0) {
 			//super
 			super(x, y);
@@ -61,6 +65,30 @@ package entities {
 			sprite_map.play("walkdown");
 		}
 		
+		override protected function resetShouldVariables():void {
+			super.resetShouldVariables();
+			shouldBounceVertical = false;
+			shouldBounceHorizontal = false;
+		}
+		
+		override protected function resolveShouldVariables():void {
+			super.resolveShouldVariables();
+			
+			//bounce
+			if (shouldBounceVertical)
+				bounceVertical();
+			if (shouldBounceHorizontal)
+				bounceHorizontal();
+		}
+		
+		override protected function checkScreenBoundaries():void {
+			if (x < 0 || x + width > FP.width)
+				shouldBounceHorizontal = true;
+			
+			if (y < 0 || y + height > FP.height)
+				shouldBounceVertical = true;
+		}
+		
 		/**
 		 * Bounce effect
 		 * @param	e
@@ -68,24 +96,15 @@ package entities {
 		 * @param	ratioY
 		 * @return
 		 */
-		override public function excludeCollide(e:MovableEntity, ratioX:int, ratioY:int):int {
+		override protected function checkExcludeCollide(e:MovableEntity, ratioX:int, ratioY:int):int {
 			//declare variables
-			var result:int = super.excludeCollide(e, ratioX, ratioY);
+			var result:int = super.checkExcludeCollide(e, ratioX, ratioY);
 			
-			//change velocities if moving in proper direction
-			if (result == hitTop) {
-				if (Math.abs(downForce.velocity) < Math.abs(upForce.velocity))
-					bounceVertical();
-			}else if(result == hitBottom) {
-				if (Math.abs(upForce.velocity) < Math.abs(downForce.velocity))
-					bounceVertical();
-			}else if (result == hitLeft) {
-				if (Math.abs(rightForce.velocity) < Math.abs(leftForce.velocity))
-					bounceHorizontal();
-			}else if (result == hitRight) {
-				if (Math.abs(leftForce.velocity) < Math.abs(rightForce.velocity))
-					bounceHorizontal();
-			}
+			//bounce
+			if (result == hitTop || result == hitBottom)
+				shouldBounceVertical = true;
+			else if (result == hitLeft || result == hitRight)
+				shouldBounceHorizontal = true;
 			
 			//return result
 			return result;

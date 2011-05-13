@@ -3,6 +3,7 @@ package entities {
 	import physics.ForceComponent;
 	
 	import flashpunk.Entity;
+	import flashpunk.FP;
 	
 	import general.Utils;
 	
@@ -19,19 +20,65 @@ package entities {
 		public var upForce:ForceComponent = new ForceComponent();
 		public var downForce:ForceComponent = new ForceComponent();
 		
+		//should
+		public var shouldStopLeft:Boolean;
+		public var shouldStopRight:Boolean;
+		public var shouldStopUp:Boolean;
+		public var shouldStopDown:Boolean;
+		
 		public function Bender(x:Number = 0, y:Number = 0) {
 			//super
 			super(x, y);
 		}
 		
+		override protected function resetShouldVariables():void {
+			super.resetShouldVariables();
+			
+			shouldMoveX = 0;
+			shouldMoveY = 0;
+			shouldStopLeft = false;
+			shouldStopRight = false;
+			shouldStopUp = false;
+			shouldStopDown = false;
+		}
+		
+		override protected function resolveShouldVariables():void {
+			super.resolveShouldVariables();
+			
+			//stop at edges
+			if (shouldStopLeft)
+				leftForce.velocity = 0;
+			if (shouldStopRight)
+				rightForce.velocity = 0;
+			if (shouldStopUp)
+				upForce.velocity = 0;
+			if (shouldStopDown)
+				downForce.velocity = 0;
+		}
+		
 		override public function preUpdate():void {
 			super.preUpdate();
+			
+			//screen boundaries
+			checkScreenBoundaries();
 			
 			//collisions against benders
 			checkCollideBender(AirBender.collisionType);
 			checkCollideBender(FireBender.collisionType);
 			checkCollideBender(EarthBender.collisionType);
 			checkCollideBender(WaterBender.collisionType);
+		}
+		
+		protected function checkScreenBoundaries():void {
+			if (x < 0)
+				shouldStopLeft = true;
+			else if (x + width > FP.width)
+				shouldStopRight = true;
+			
+			if (y < 0)
+				shouldStopUp = true;
+			else if (y + height > FP.height)
+				shouldStopDown = true;
 		}
 		
 		protected function checkCollideBender(benderCollisionType:String):void {
@@ -47,13 +94,12 @@ package entities {
 			
 			//loop through vector
 			for each (var e:MovableEntity in collisionList) {
-				excludeCollide(e, 25, 32);
+				checkExcludeCollide(e, 25, 32);
 			}
 		}
 		
 		override public function update():void {
-			x += shouldMoveX;
-			y += shouldMoveY;
+			super.update();
 			updateMovement();
 		}
 		
