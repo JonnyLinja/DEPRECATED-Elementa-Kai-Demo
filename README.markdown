@@ -68,8 +68,8 @@ When an opponent's command is received, the true state is updated to the receive
 
 1. Player2 receives the command
 2. Command is stored in the datastructure
-3. True state is updated to the timestamp of the command
-4. Commands up to that timestamp (including the just received one) are executed in the true state
+3. True state is updated to the frame of the command
+4. Commands up to that frame (including the just received one) are executed in the true state
 5. Perceived state is rolled back to the true state
 6. Perceived state is updated to the current time, executing any remaining stored commands
 7. Changes due to the received command are rendered
