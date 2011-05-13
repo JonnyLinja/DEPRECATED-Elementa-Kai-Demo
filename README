@@ -1,4 +1,7 @@
+Note that the flashpunk used here is the same fork of the engine as https://github.com/SelfPossessed/FlashPunk
+
 If you wish to run this code, you will need to:
 1) Make a PlayerIO account and follow their setup instructions
 2) Replace their Game.cs with the Game.cs located inside this repo
 3) Put your own game id inside Net.as
+4) Build the SWF
