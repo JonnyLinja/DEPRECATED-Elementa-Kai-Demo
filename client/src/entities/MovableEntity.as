@@ -25,6 +25,16 @@ package entities {
 			this.y = y;
 		}
 		
+		private function resetShouldMove():void {
+			shouldMoveX = 0;
+			shouldMoveY = 0;
+		}
+		
+		override public function preUpdate():void {
+			resetShouldMove();
+			super.preUpdate();
+		}
+		
 		/**
 		 * Moves colliding entities out of the way
 		 * Assumes that entities do collide

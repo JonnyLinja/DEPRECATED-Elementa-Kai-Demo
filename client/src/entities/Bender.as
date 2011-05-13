@@ -25,16 +25,13 @@ package entities {
 		}
 		
 		override public function preUpdate():void {
-			resetShouldMove();
+			super.preUpdate();
+			
+			//collisions against benders
 			checkCollideBender(AirBender.collisionType);
 			checkCollideBender(FireBender.collisionType);
 			checkCollideBender(EarthBender.collisionType);
 			checkCollideBender(WaterBender.collisionType);
-		}
-		
-		private function resetShouldMove():void {
-			shouldMoveX = 0;
-			shouldMoveY = 0;
 		}
 		
 		protected function checkCollideBender(benderCollisionType:String):void {

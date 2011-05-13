@@ -1,6 +1,4 @@
 package worlds {
-	import flash.events.Event;
-	
 	import playerio.Message;
 	
 	import flashpunk.utils.Input;
@@ -57,10 +55,14 @@ package worlds {
 			
 			//message handler
 			Net.conn.addMessageHandler(Net.messageCommands, receiveEnemyCommands);
-			
-			//window focus
-			FP.stage.addEventListener(Event.ACTIVATE, function():void { lostWindowFocus = true; } );
-			FP.stage.addEventListener(Event.DEACTIVATE, function():void { Input.clear(); } );
+		}
+		
+		/**
+		 * Window focus
+		 */
+		override public function focusLost():void {
+			Input.clear();
+			lostWindowFocus = true;
 		}
 		
 		/**
