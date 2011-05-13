@@ -34,6 +34,8 @@ The code is developed with peer to peer in mind. However, to avoid requiring use
 
 The server does not attempt to get two players with vastly different pings to start the game at approximately the same time yet.
 
+Currently, the server matches up any pair of players who join the lobby room into a new unique room whose id based on the current timestamp.
+
 ROLLBACK
 =====
 
