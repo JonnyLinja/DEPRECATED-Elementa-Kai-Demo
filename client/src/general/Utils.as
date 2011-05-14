@@ -1,4 +1,10 @@
 package general {
+	import entities.MovableEntity;
+	import entities.AirBender;
+	import entities.EarthBender;
+	import entities.FireBender;
+	import entities.WaterBender;
+	
 	import flash.external.ExternalInterface;
 	import flash.utils.ByteArray;
 
@@ -38,6 +44,16 @@ package general {
 			var c:Object = a;
 			a = b;
 			b = c;
+		}
+		
+		public static function isBender(e:MovableEntity):Boolean {
+			return (e.type == WaterBender.collisionType || e.type == FireBender.collisionType || e.type == EarthBender.collisionType || e.type == AirBender.collisionType);
+		}
+		
+		public static function negative(n:Number):Number {
+			if (n < 0)
+				return n;
+			return -n;
 		}
 		
 		public function Utils() {

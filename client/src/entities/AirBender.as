@@ -81,12 +81,32 @@ package entities {
 				bounceHorizontal();
 		}
 		
-		override protected function checkScreenBoundaries():void {
-			if (x < 0 || x + width > FP.width)
+		override protected function checkOffScreenLeft(clamp:Boolean=true):Boolean {
+			var result:Boolean = super.checkOffScreenLeft(false);
+			if (result)
 				shouldBounceHorizontal = true;
-			
-			if (y < 0 || y + height > FP.height)
+			return result;
+		}
+		
+		override protected function checkOffScreenRight(clamp:Boolean=true):Boolean {
+			var result:Boolean = super.checkOffScreenRight(false);
+			if (result)
+				shouldBounceHorizontal = true;
+			return result;
+		}
+		
+		override protected function checkOffScreenTop(clamp:Boolean=true):Boolean {
+			var result:Boolean = super.checkOffScreenTop(false);
+			if (result)
 				shouldBounceVertical = true;
+			return result;
+		}
+		
+		override protected function checkOffScreenBottom(clamp:Boolean=true):Boolean {
+			var result:Boolean = super.checkOffScreenBottom(false);
+			if (result)
+				shouldBounceVertical = true;
+			return result;
 		}
 		
 		/**
@@ -99,12 +119,27 @@ package entities {
 		override protected function checkExcludeCollide(e:MovableEntity, ratioX:int, ratioY:int):int {
 			//declare variables
 			var result:int = super.checkExcludeCollide(e, ratioX, ratioY);
+			var isBender:Boolean = Utils.isBender(e);
 			
-			//bounce
-			if (result == hitTop || result == hitBottom)
+			//bounce and add windforce to other benders
+			//may want to split add windforce up for clarity later
+			if (result == hitTop) {
 				shouldBounceVertical = true;
-			else if (result == hitLeft || result == hitRight)
+				if (isBender && isMovingUp())
+					e.windForce.y += moveForce.y.velocity;
+			}else if (result == hitBottom) {
+				shouldBounceVertical = true;
+				if (isBender && isMovingDown())
+					e.windForce.y += moveForce.y.velocity;
+			}else if (result == hitLeft) {
 				shouldBounceHorizontal = true;
+				if (isBender && isMovingLeft())
+					e.windForce.x += moveForce.x.velocity;
+			}else if (result == hitRight) {
+				shouldBounceHorizontal = true;
+				if (isBender && isMovingRight())
+					e.windForce.x += moveForce.x.velocity;
+			}
 			
 			//return result
 			return result;

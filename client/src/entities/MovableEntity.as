@@ -7,7 +7,7 @@ package entities {
 	import general.Utils;
 	
 	import physics.ForceVector;
-	import physics.WindForceVector;
+	import physics.WindForce;
 	
 	//MAY WANT TO MOVE THIS STUFF TO ENTITY ITSELF
 	
@@ -21,13 +21,14 @@ package entities {
 		
 		//forces
 		public var moveForce:ForceVector = new ForceVector();
-		public var windForce:WindForceVector = new WindForceVector();
+		public var windForce:WindForce = new WindForce();
 		
 		//should
 		public var shouldMoveX:Number;
 		public var shouldMoveY:Number;
 		
-		public function MovableEntity(x:Number=0, y:Number=0) {
+		public function MovableEntity(x:Number = 0, y:Number = 0) {
+			//position
 			this.x = x;
 			this.y = y;
 		}
@@ -51,6 +52,11 @@ package entities {
 		override public function update():void {
 			super.update();
 			resolveShouldVariables();
+			
+			//windforce
+			windForce.applyDecel();
+			x += windForce.x;
+			y += windForce.y;
 		}
 		
 		/**
@@ -130,20 +136,73 @@ package entities {
 			return ((intersect.x / ratioY) <= (intersect.y / ratioX));
 		}
 		
+		protected function checkOffScreenLeft(clamp:Boolean=true):Boolean {
+			if (x < 0) {
+				if(clamp)
+					shouldMoveX -= x;
+				return true;
+			}
+			return false;
+		}
+		
+		protected function checkOffScreenRight(clamp:Boolean=true):Boolean {
+			if (x + width > FP.width) {
+				if(clamp)
+					shouldMoveX -= (x + width - FP.width);
+				return true;
+			}
+			return false;
+		}
+		
+		protected function checkOffScreenTop(clamp:Boolean=true):Boolean {
+			if (y < 0) {
+				if(clamp)
+					shouldMoveY -= y;
+				return true;
+			}
+			return false;
+		}
+		
+		protected function checkOffScreenBottom(clamp:Boolean=true):Boolean {
+			if (y + height > FP.height) {
+				if(clamp)
+					shouldMoveY -= (y + height - FP.height);
+				return true;
+			}
+			return false;
+		}
+		
 		protected function checkClampOnScreen():void {
-			if (x < 0)
-				//left
-				shouldMoveX -= x;
-			else if (x + width > FP.width)
-				//right
-				shouldMoveX -= (x + width - FP.width);
+			checkOffScreenLeft();
+			checkOffScreenRight();
+			checkOffScreenTop();
+			checkOffScreenBottom();
+		}
+		
+		public function isMovingUp():Boolean {
+			return (moveForce.y.velocity < 0);
+		}
+		
+		public function isMovingDown():Boolean {
+			return (moveForce.y.velocity > 0);
+		}
+		
+		public function isMovingLeft():Boolean {
+			return (moveForce.x.velocity < 0);
+		}
+		
+		public function isMovingRight():Boolean {
+			return (moveForce.x.velocity > 0);
+		}
+		
+		override public function rollback(oldEntity:Entity):void {
+			super.rollback(oldEntity);
 			
-			if (y < 0)
-				//up
-				shouldMoveY -= y;
-			else if (y + height > FP.height)
-				//down
-				shouldMoveY -= (y + height - FP.height);
+			//declare
+			var temp:MovableEntity = oldEntity as MovableEntity;
+			
+			//rollback forces
+			moveForce.rollback(temp.moveForce);
 		}
 	}
 }

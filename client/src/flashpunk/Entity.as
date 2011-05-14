@@ -791,7 +791,9 @@ package flashpunk
 		 * @param	oldEntity	entity to be rolled back to
 		 */
 		public function rollback(oldEntity:Entity):void {
-			
+			//position
+			x = oldEntity.x;
+			y = oldEntity.y;
 		}
 		
 		/**

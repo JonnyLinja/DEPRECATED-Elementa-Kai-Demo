@@ -46,21 +46,30 @@ package entities {
 			super.resolveShouldVariables();
 			
 			//stop at edges
-			if (shouldStopLeft)
+			if (shouldStopLeft) {
 				leftForce.velocity = 0;
-			if (shouldStopRight)
+				if (windForce.x < 0)
+					windForce.x = 0;
+			}
+			if (shouldStopRight) {
 				rightForce.velocity = 0;
-			if (shouldStopUp)
+				if (windForce.x > 0)
+					windForce.x = 0;
+			}
+			if (shouldStopUp) {
 				upForce.velocity = 0;
-			if (shouldStopDown)
+				if (windForce.y < 0)
+					windForce.y = 0;
+			}
+			if (shouldStopDown) {
 				downForce.velocity = 0;
+				if (windForce.y > 0)
+					windForce.y = 0;
+			}
 		}
 		
 		override public function preUpdate():void {
 			super.preUpdate();
-			
-			//screen boundaries
-			checkScreenBoundaries();
 			
 			//collisions against benders
 			checkCollideBender(AirBender.collisionType);
@@ -69,16 +78,36 @@ package entities {
 			checkCollideBender(WaterBender.collisionType);
 		}
 		
-		protected function checkScreenBoundaries():void {
-			if (x < 0)
-				shouldStopLeft = true;
-			else if (x + width > FP.width)
-				shouldStopRight = true;
-			
-			if (y < 0)
-				shouldStopUp = true;
-			else if (y + height > FP.height)
-				shouldStopDown = true;
+		override protected function checkOffScreenLeft(clamp:Boolean = true):Boolean {
+			if(clamp) {
+				shouldStopLeft = super.checkOffScreenLeft(clamp);
+				return shouldStopLeft;
+			}
+			return super.checkOffScreenLeft(clamp);
+		}
+		
+		override protected function checkOffScreenRight(clamp:Boolean = true):Boolean {
+			if(clamp) {
+				shouldStopRight = super.checkOffScreenRight(clamp);
+				return shouldStopRight;
+			}
+			return super.checkOffScreenRight(clamp);
+		}
+		
+		override protected function checkOffScreenTop(clamp:Boolean = true):Boolean {
+			if(clamp) {
+				shouldStopUp = super.checkOffScreenTop(clamp);
+				return shouldStopUp;
+			}
+			return super.checkOffScreenTop(clamp);
+		}
+		
+		override protected function checkOffScreenBottom(clamp:Boolean=true):Boolean {
+			if(clamp) {
+				shouldStopDown = super.checkOffScreenBottom(clamp);
+				return shouldStopDown;
+			}
+			return super.checkOffScreenBottom(clamp);
 		}
 		
 		protected function checkCollideBender(benderCollisionType:String):void {
@@ -139,12 +168,10 @@ package entities {
 		}
 		
 		override public function rollback(oldEntity:Entity):void {
+			super.rollback(oldEntity);
+			
 			//declare
 			var temp:Bender = oldEntity as Bender;
-			
-			//position
-			x = temp.x;
-			y = temp.y;
 			
 			//move booleans
 			moveLeft = temp.moveLeft;
