@@ -31,6 +31,19 @@ package entities {
 			super(x, y);
 		}
 		
+		override protected function checkExcludeCollide(e:MovableEntity, ratioX:int, ratioY:int):int {
+			var result:int = super.checkExcludeCollide(e, ratioX, ratioY);
+			if (result == hitTop)
+				shouldStopUp = true;
+			else if (result == hitBottom)
+				shouldStopDown = true;
+			else if (result == hitLeft)
+				shouldStopLeft = true;
+			else if (result == hitRight)
+				shouldStopRight = true;
+			return result;
+		}
+		
 		override protected function resetShouldVariables():void {
 			super.resetShouldVariables();
 			
@@ -78,37 +91,51 @@ package entities {
 			checkCollideBender(WaterBender.collisionType);
 		}
 		
-		override protected function checkOffScreenLeft(clamp:Boolean = true):Boolean {
-			if(clamp) {
-				shouldStopLeft = super.checkOffScreenLeft(clamp);
-				return shouldStopLeft;
+		//override these for deaths offscreen
+		/*
+		protected function checkOffScreenLeft(clamp:Boolean=true):Boolean {
+			if (x < 0) {
+				if(clamp)
+					shouldMoveX -= x;
+				return true;
 			}
-			return super.checkOffScreenLeft(clamp);
+			return false;
 		}
 		
-		override protected function checkOffScreenRight(clamp:Boolean = true):Boolean {
-			if(clamp) {
-				shouldStopRight = super.checkOffScreenRight(clamp);
-				return shouldStopRight;
+		protected function checkOffScreenRight(clamp:Boolean=true):Boolean {
+			if (x + width > FP.width) {
+				if(clamp)
+					shouldMoveX -= (x + width - FP.width);
+				return true;
 			}
-			return super.checkOffScreenRight(clamp);
+			return false;
 		}
 		
-		override protected function checkOffScreenTop(clamp:Boolean = true):Boolean {
-			if(clamp) {
-				shouldStopUp = super.checkOffScreenTop(clamp);
-				return shouldStopUp;
+		protected function checkOffScreenTop(clamp:Boolean=true):Boolean {
+			if (y < 0) {
+				if(clamp)
+					shouldMoveY -= y;
+				return true;
 			}
-			return super.checkOffScreenTop(clamp);
+			return false;
 		}
 		
-		override protected function checkOffScreenBottom(clamp:Boolean=true):Boolean {
-			if(clamp) {
-				shouldStopDown = super.checkOffScreenBottom(clamp);
-				return shouldStopDown;
+		protected function checkOffScreenBottom(clamp:Boolean=true):Boolean {
+			if (y + height > FP.height) {
+				if(clamp)
+					shouldMoveY -= (y + height - FP.height);
+				return true;
 			}
-			return super.checkOffScreenBottom(clamp);
+			return false;
 		}
+		
+		protected function checkClampOnScreen():void {
+			checkOffScreenLeft();
+			checkOffScreenRight();
+			checkOffScreenTop();
+			checkOffScreenBottom();
+		}
+		*/
 		
 		protected function checkCollideBender(benderCollisionType:String):void {
 			//should check
@@ -184,8 +211,6 @@ package entities {
 			rightForce.rollback(temp.rightForce);
 			upForce.rollback(temp.upForce);
 			downForce.rollback(temp.downForce);
-			
-			//wind force
 		}
 	}
 }

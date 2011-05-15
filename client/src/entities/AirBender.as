@@ -80,7 +80,7 @@ package entities {
 			if (shouldBounceHorizontal)
 				bounceHorizontal();
 		}
-		
+		/*
 		override protected function checkOffScreenLeft(clamp:Boolean=true):Boolean {
 			var result:Boolean = super.checkOffScreenLeft(false);
 			if (result)
@@ -108,7 +108,7 @@ package entities {
 				shouldBounceVertical = true;
 			return result;
 		}
-		
+		*/
 		/**
 		 * Bounce effect
 		 * @param	e
@@ -140,6 +140,12 @@ package entities {
 				if (isBender && isMovingRight())
 					e.windForce.x += moveForce.x.velocity;
 			}
+			
+			//ignore should stops
+			shouldStopDown = false;
+			shouldStopLeft = false;
+			shouldStopRight = false;
+			shouldStopUp = false;
 			
 			//return result
 			return result;

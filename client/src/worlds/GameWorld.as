@@ -4,6 +4,7 @@ package worlds {
 	import entities.AirBender;
 	import entities.EarthBender;
 	import entities.FireBender;
+	import entities.Wall;
 	import entities.WaterBender;
 	
 	import flashpunk.World;
@@ -25,10 +26,14 @@ package worlds {
 		 * @param	isP1
 		 */
 		public function GameWorld() {
-			player1 = new FireBender(200, 200);
-			player2 = new AirBender(150, 150);
+			player1 = new AirBender(200, 0);
+			player2 = new WaterBender(150, 0);
 			add(player1);
 			add(player2);
+			add(new Wall( -FP.width, -FP.height, FP.width * 3, FP.height));
+			add(new Wall( -FP.width, FP.height, FP.width * 3, FP.height));
+			add(new Wall( -FP.width, -FP.height, FP.width, FP.height * 3));
+			add(new Wall( FP.width, -FP.height, FP.width, FP.height * 3));
 			updateLists();
 		}
 		

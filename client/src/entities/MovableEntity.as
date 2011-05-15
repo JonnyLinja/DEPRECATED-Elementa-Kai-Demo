@@ -27,6 +27,8 @@ package entities {
 		public var shouldMoveX:Number;
 		public var shouldMoveY:Number;
 		
+		public var canMove:Boolean=true;
+		
 		public function MovableEntity(x:Number = 0, y:Number = 0) {
 			//position
 			this.x = x;
@@ -46,7 +48,8 @@ package entities {
 		override public function preUpdate():void {
 			super.preUpdate();
 			resetShouldVariables();
-			checkClampOnScreen();
+			//checkClampOnScreen();
+			checkCollideWall();
 		}
 		
 		override public function update():void {
@@ -70,8 +73,31 @@ package entities {
 		 * @return
 		 */
 		protected function checkExcludeCollide(e:MovableEntity, ratioX:int, ratioY:int):int {
+			if (!canMove)
+				return hitNone;
+			
 			//declare variables
 			var intersect:Point = getIntersectRect(e);
+			
+			//ratio - may not need, might be able to fudge with 1-1 ratio
+			//right now set to use bigger of the two
+			//could set to use smaller no problem
+			/*
+			if (width * height > e.width * e.height) {
+				ratioX = width;
+				ratioY = height;
+			}else {
+				ratioX = e.width;
+				ratioY = e.height;
+			}
+			*/
+			
+			ratioX = 1;
+			ratioY = 1;
+			
+			//ARGH didn't divide by 2, but still seems to work? wtf?
+			//it should move too far away but it doesn't!
+			//oh well leave it? easier?
 			
 			//exclude
 			if (hitHorizontal(intersect, ratioX, ratioY)) {
@@ -114,12 +140,16 @@ package entities {
 				intersectionWidth = Math.abs(x + width - e.x);
 			else if (e.x != x)
 				intersectionWidth = Math.abs(e.x + e.width - x);
+			else
+				intersectionWidth = Utils.least(width, e.width);
 			
 			//vertical
 			if (y < e.y)
 				intersectionHeight = Math.abs(y + height - e.y);
 			else if (e.y != y)
 				intersectionHeight = Math.abs(e.y + e.height - y);
+			else
+				intersectionHeight = Utils.least(height, e.height);
 			
 			//return point
 			return new Point(intersectionWidth, intersectionHeight);
@@ -136,47 +166,17 @@ package entities {
 			return ((intersect.x / ratioY) <= (intersect.y / ratioX));
 		}
 		
-		protected function checkOffScreenLeft(clamp:Boolean=true):Boolean {
-			if (x < 0) {
-				if(clamp)
-					shouldMoveX -= x;
-				return true;
+		protected function checkCollideWall():void {
+			//declare variables
+			var collisionList:Vector.<Entity> = new Vector.<Entity>();
+			
+			//populate vector
+			collideInto(Wall.collisionType, x, y, collisionList);
+			
+			//loop through vector
+			for each (var e:MovableEntity in collisionList) {
+				checkExcludeCollide(e, 25, 32);
 			}
-			return false;
-		}
-		
-		protected function checkOffScreenRight(clamp:Boolean=true):Boolean {
-			if (x + width > FP.width) {
-				if(clamp)
-					shouldMoveX -= (x + width - FP.width);
-				return true;
-			}
-			return false;
-		}
-		
-		protected function checkOffScreenTop(clamp:Boolean=true):Boolean {
-			if (y < 0) {
-				if(clamp)
-					shouldMoveY -= y;
-				return true;
-			}
-			return false;
-		}
-		
-		protected function checkOffScreenBottom(clamp:Boolean=true):Boolean {
-			if (y + height > FP.height) {
-				if(clamp)
-					shouldMoveY -= (y + height - FP.height);
-				return true;
-			}
-			return false;
-		}
-		
-		protected function checkClampOnScreen():void {
-			checkOffScreenLeft();
-			checkOffScreenRight();
-			checkOffScreenTop();
-			checkOffScreenBottom();
 		}
 		
 		public function isMovingUp():Boolean {
