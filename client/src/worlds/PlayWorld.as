@@ -184,7 +184,7 @@ package worlds {
 		 */
 		private function updateTrueWorld():void {
 			//determine frame to loop to
-			var leastFrame:Number = Utils.least(lastEnemyFrame, perceivedFrame);
+			var leastFrame:Number = Math.min(lastEnemyFrame, perceivedFrame);
 			
 			//should render
 			if(trueFrame <= leastFrame)
@@ -226,7 +226,7 @@ package worlds {
 				}
 				
 				//update true world
-				trueWorld.updateGameWorld();
+				trueWorld.update();
 				
 				//increment true frame
 				trueFrame++;
@@ -267,7 +267,7 @@ package worlds {
 				}
 				
 				//update perceived world
-				perceivedWorld.updateGameWorld();
+				perceivedWorld.update();
 			}
 		}
 		
@@ -312,7 +312,7 @@ package worlds {
 				}
 				
 				//update perceived world
-				perceivedWorld.updateGameWorld();
+				perceivedWorld.update();
 				
 				//increment perceived frame
 				perceivedFrame++;

@@ -16,6 +16,41 @@ package flashpunk
 	public class Entity extends Tweener
 	{
 		/**
+		 * Collision did not occur
+		 */
+		public const hitNone:int = 0;
+		
+		/**
+		 * Collided along the top side
+		 */
+		public const hitTop:int = 1;
+		
+		/**
+		 * Collided along the bottom side
+		 */
+		public const hitBottom:int = 2;
+		
+		/**
+		 * Collided along the left side
+		 */
+		public const hitLeft:int = 3;
+		
+		/**
+		 * Collided along the right side
+		 */
+		public const hitRight:int = 4;
+		
+		/**
+		 * How far the Entity should move along the X axis next update
+		 */
+		public var shouldMoveX:Number;
+		
+		/**
+		 * How far the Entity should move along the Y axis next update
+		 */
+		public var shouldMoveY:Number;
+		
+		/**
 		 * If the Entity should render.
 		 */
 		public var visible:Boolean = true;
@@ -94,20 +129,41 @@ package flashpunk
 		}
 		
 		/**
-		 * Updates the Entity.
+		 * Resets should variables.
+		 * Called at start of preUpdate.
 		 */
-		override public function update():void 
-		{
-			
+		protected function resetShouldVariables():void {
+			shouldMoveX = 0;
+			shouldMoveY = 0;
+		}
+		
+		/**
+		 * Resolves should variables.
+		 * Called at start of update.
+		 */
+		protected function resolveShouldVariables():void {
+			x += shouldMoveX;
+			y += shouldMoveY;
 		}
 		
 		/**
 		 * Called before update.
 		 * Used for checks that don't affect position.
+		 * Calls resetShouldVariables.
 		 */
 		public function preUpdate():void 
 		{
-			
+			resetShouldVariables();
+		}
+		
+		/**
+		 * Updates the Entity.
+		 * Used for anything that does affect position.
+		 * Calls resolveShouldVariables.
+		 */
+		override public function update():void 
+		{
+			resolveShouldVariables();
 		}
 		
 		/**
@@ -390,6 +446,115 @@ package flashpunk
 		{
 			if (!_world && !_group) return;
 			for each (var type:String in types) collideInto(type, x, y, array);
+		}
+		
+		/**
+		 * Checks for collisions against a type
+		 * Calls callback with entity and the hitTest
+		 * @param	type
+		 * @param	callback
+		 * @param	preventOverlap
+		 */
+		protected function checkCollide(type:String, callback:Function, preventOverlap:Boolean=false):void {
+			//declare variables
+			var collisionList:Vector.<Entity> = new Vector.<Entity>();
+			
+			//populate vector
+			collideInto(type, x, y, collisionList);
+			
+			//loop through vector
+			for each (var e:Entity in collisionList) {
+				callback(e, hitTest(e, preventOverlap)); //should I send the intersection rectangle as well?
+			}
+		}
+		
+		/**
+		 * Returns which side was hit
+		 * Assumes that the two Entites DO ALREADY COLLIDE
+		 * Sets shouldMoveX and shouldMoveY if preventOverlap is true
+		 * @param	e
+		 * @param	preventOverlap
+		 * @return
+		 */
+		protected function hitTest(e:Entity, preventOverlap:Boolean=false):int {
+			var intersect:Point = getIntersectRect(e);
+			//ratio - may not need, might be able to fudge with 1-1 ratio
+			//right now set to use bigger of the two
+			//could set to use smaller no problem
+			/*
+			if (width * height > e.width * e.height) {
+				ratioX = width;
+				ratioY = height;
+			}else {
+				ratioX = e.width;
+				ratioY = e.height;
+			}
+			*/
+			
+			var ratioX:int = 1;
+			var ratioY:int = 1;
+			
+			//Didn't divide by 2, but still seems to work? wtf? It should move too far away...but it's fine
+			//Leaving it for now!
+			
+			//exclude
+			if ((intersect.x / ratioY) <= (intersect.y / ratioX)) {
+				//horizontal
+				if (x < e.x) {
+					//left
+					if(preventOverlap)
+						shouldMoveX -= intersect.x;
+					return hitRight;
+				}else {
+					//right
+					if(preventOverlap)
+						shouldMoveX += intersect.x;
+					return hitLeft;
+				}
+			}else {
+				//vertical
+				if (y < e.y) {
+					//up
+					if(preventOverlap)
+						shouldMoveY -= intersect.y;
+					return hitBottom;
+				}else {
+					//down
+					if(preventOverlap)
+						shouldMoveY += intersect.y;
+					return hitTop;
+				}
+			}
+		}
+		
+		/**
+		 * Returns point with the size of the intersecting collision rectangle
+		 * @param	e
+		 * @return
+		 */
+		protected function getIntersectRect(e:Entity):Point {
+			//declare variables
+			var intersectionWidth:Number = 0;
+			var intersectionHeight:Number = 0;
+			
+			//horizontal
+			if (x < e.x)
+				intersectionWidth = Math.abs(x + width - e.x);
+			else if (e.x != x)
+				intersectionWidth = Math.abs(e.x + e.width - x);
+			else
+				intersectionWidth = Math.min(width, e.width);
+			
+			//vertical
+			if (y < e.y)
+				intersectionHeight = Math.abs(y + height - e.y);
+			else if (e.y != y)
+				intersectionHeight = Math.abs(e.y + e.height - y);
+			else
+				intersectionHeight = Math.min(height, e.height);
+			
+			//return point
+			return new Point(intersectionWidth, intersectionHeight);
 		}
 		
 		/**

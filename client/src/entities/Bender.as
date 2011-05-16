@@ -31,24 +31,9 @@ package entities {
 			super(x, y);
 		}
 		
-		override protected function checkExcludeCollide(e:MovableEntity, ratioX:int, ratioY:int):int {
-			var result:int = super.checkExcludeCollide(e, ratioX, ratioY);
-			if (result == hitTop)
-				shouldStopUp = true;
-			else if (result == hitBottom)
-				shouldStopDown = true;
-			else if (result == hitLeft)
-				shouldStopLeft = true;
-			else if (result == hitRight)
-				shouldStopRight = true;
-			return result;
-		}
-		
 		override protected function resetShouldVariables():void {
 			super.resetShouldVariables();
 			
-			shouldMoveX = 0;
-			shouldMoveY = 0;
 			shouldStopLeft = false;
 			shouldStopRight = false;
 			shouldStopUp = false;
@@ -85,73 +70,33 @@ package entities {
 			super.preUpdate();
 			
 			//collisions against benders
-			checkCollideBender(AirBender.collisionType);
-			checkCollideBender(FireBender.collisionType);
-			checkCollideBender(EarthBender.collisionType);
-			checkCollideBender(WaterBender.collisionType);
+			if(type != AirBender.collisionType)
+				checkCollide(AirBender.collisionType, didCollideWithBender, true);
+			if (type != EarthBender.collisionType)
+				checkCollide(EarthBender.collisionType, didCollideWithBender, true);
+			if (type != FireBender.collisionType)
+				checkCollide(FireBender.collisionType, didCollideWithBender, true);
+			if (type != WaterBender.collisionType)
+				checkCollide(WaterBender.collisionType, didCollideWithBender, true);
 		}
 		
-		//override these for deaths offscreen
-		/*
-		protected function checkOffScreenLeft(clamp:Boolean=true):Boolean {
-			if (x < 0) {
-				if(clamp)
-					shouldMoveX -= x;
-				return true;
-			}
-			return false;
+		protected function collideShouldStop(hitTest:int):void {
+			if (hitTest == hitTop)
+				shouldStopUp = true;
+			else if (hitTest == hitLeft)
+				shouldStopLeft = true;
+			else if (hitTest == hitRight)
+				shouldStopRight = true;
+			else if (hitTest == hitBottom)
+				shouldStopDown = true;
 		}
 		
-		protected function checkOffScreenRight(clamp:Boolean=true):Boolean {
-			if (x + width > FP.width) {
-				if(clamp)
-					shouldMoveX -= (x + width - FP.width);
-				return true;
-			}
-			return false;
+		override protected function didCollideWithWall(e:Wall, hitTest:int):void {
+			collideShouldStop(hitTest);
 		}
 		
-		protected function checkOffScreenTop(clamp:Boolean=true):Boolean {
-			if (y < 0) {
-				if(clamp)
-					shouldMoveY -= y;
-				return true;
-			}
-			return false;
-		}
-		
-		protected function checkOffScreenBottom(clamp:Boolean=true):Boolean {
-			if (y + height > FP.height) {
-				if(clamp)
-					shouldMoveY -= (y + height - FP.height);
-				return true;
-			}
-			return false;
-		}
-		
-		protected function checkClampOnScreen():void {
-			checkOffScreenLeft();
-			checkOffScreenRight();
-			checkOffScreenTop();
-			checkOffScreenBottom();
-		}
-		*/
-		
-		protected function checkCollideBender(benderCollisionType:String):void {
-			//should check
-			if (type == benderCollisionType)
-				return;
-			
-			//declare variables
-			var collisionList:Vector.<Entity> = new Vector.<Entity>();
-			
-			//populate vector
-			collideInto(benderCollisionType, x, y, collisionList);
-			
-			//loop through vector
-			for each (var e:MovableEntity in collisionList) {
-				checkExcludeCollide(e, 25, 32);
-			}
+		protected function didCollideWithBender(e:Bender, hitTest:int):void {
+			collideShouldStop(hitTest);
 		}
 		
 		override public function update():void {

@@ -1,5 +1,7 @@
 package entities {
-	public class Wall extends MovableEntity {
+	import flashpunk.Entity;
+	
+	public class Wall extends Entity {
 		public static const collisionType:String = "wall";
 		
 		public function Wall(x:Number, y:Number, width:Number, height:Number) {
@@ -9,8 +11,6 @@ package entities {
 			this.height = height;
 			
 			type = Wall.collisionType;
-			
-			canMove = false;
 		}
 	}
 }

@@ -53,28 +53,7 @@
 		 */
 		override public function update():void 
 		{
-			// update the entities
-			var e:Entity = _updateFirst;
-			while (e)
-			{
-				if (e.active)
-				{
-					if (e._tween) e.updateTweens();
-					e.update();
-				}
-				if (e._graphic && e._graphic.active) e._graphic.update();
-				e = e._updateNext;
-			}
-		}
-		
-		/**
-		 * Performed by the game loop, updates all contained Entities.
-		 * If you override this to give your World update code, remember
-		 * to call super.updateGameWorld() or your Entities will not be updated.
-		 */
-		public function updateGameWorld():void 
-		{
-			// update the collisions of entities
+			// preupdate checks
 			var e:Entity = _updateFirst;
 			while (e)
 			{

@@ -80,75 +80,32 @@ package entities {
 			if (shouldBounceHorizontal)
 				bounceHorizontal();
 		}
-		/*
-		override protected function checkOffScreenLeft(clamp:Boolean=true):Boolean {
-			var result:Boolean = super.checkOffScreenLeft(false);
-			if (result)
+		
+		override protected function collideShouldStop(hitTest:int):void {
+			if (hitTest == hitTop || hitTest == hitBottom)
+				shouldBounceVertical = true;
+			else if (hitTest == hitLeft || hitTest == hitRight)
 				shouldBounceHorizontal = true;
-			return result;
 		}
 		
-		override protected function checkOffScreenRight(clamp:Boolean=true):Boolean {
-			var result:Boolean = super.checkOffScreenRight(false);
-			if (result)
-				shouldBounceHorizontal = true;
-			return result;
-		}
-		
-		override protected function checkOffScreenTop(clamp:Boolean=true):Boolean {
-			var result:Boolean = super.checkOffScreenTop(false);
-			if (result)
+		override protected function didCollideWithBender(e:Bender, hitTest:int):void {
+			if (hitTest == hitTop) {
 				shouldBounceVertical = true;
-			return result;
-		}
-		
-		override protected function checkOffScreenBottom(clamp:Boolean=true):Boolean {
-			var result:Boolean = super.checkOffScreenBottom(false);
-			if (result)
-				shouldBounceVertical = true;
-			return result;
-		}
-		*/
-		/**
-		 * Bounce effect
-		 * @param	e
-		 * @param	ratioX
-		 * @param	ratioY
-		 * @return
-		 */
-		override protected function checkExcludeCollide(e:MovableEntity, ratioX:int, ratioY:int):int {
-			//declare variables
-			var result:int = super.checkExcludeCollide(e, ratioX, ratioY);
-			var isBender:Boolean = Utils.isBender(e);
-			
-			//bounce and add windforce to other benders
-			//may want to split add windforce up for clarity later
-			if (result == hitTop) {
-				shouldBounceVertical = true;
-				if (isBender && isMovingUp())
+				if (isMovingUp())
 					e.windForce.y += moveForce.y.velocity;
-			}else if (result == hitBottom) {
+			}else if (hitTest == hitBottom) {
 				shouldBounceVertical = true;
-				if (isBender && isMovingDown())
+				if (isMovingDown())
 					e.windForce.y += moveForce.y.velocity;
-			}else if (result == hitLeft) {
+			}else if (hitTest == hitLeft) {
 				shouldBounceHorizontal = true;
-				if (isBender && isMovingLeft())
+				if (isMovingLeft())
 					e.windForce.x += moveForce.x.velocity;
-			}else if (result == hitRight) {
+			}else if (hitTest == hitRight) {
 				shouldBounceHorizontal = true;
-				if (isBender && isMovingRight())
+				if (isMovingRight())
 					e.windForce.x += moveForce.x.velocity;
 			}
-			
-			//ignore should stops
-			shouldStopDown = false;
-			shouldStopLeft = false;
-			shouldStopRight = false;
-			shouldStopUp = false;
-			
-			//return result
-			return result;
 		}
 		
 		private function bounceVertical():void {
