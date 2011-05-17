@@ -129,24 +129,6 @@ package flashpunk
 		}
 		
 		/**
-		 * Resets should variables.
-		 * Called at start of preUpdate.
-		 */
-		protected function resetShouldVariables():void {
-			shouldMoveX = 0;
-			shouldMoveY = 0;
-		}
-		
-		/**
-		 * Resolves should variables.
-		 * Called at start of update.
-		 */
-		protected function resolveShouldVariables():void {
-			x += shouldMoveX;
-			y += shouldMoveY;
-		}
-		
-		/**
 		 * Called before update.
 		 * Used for checks that don't affect position.
 		 * Calls resetShouldVariables.
@@ -157,6 +139,15 @@ package flashpunk
 		}
 		
 		/**
+		 * Resets should variables.
+		 * Called at start of preUpdate.
+		 */
+		protected function resetShouldVariables():void {
+			shouldMoveX = 0;
+			shouldMoveY = 0;
+		}
+		
+		/**
 		 * Updates the Entity.
 		 * Used for anything that does affect position.
 		 * Calls resolveShouldVariables.
@@ -164,6 +155,15 @@ package flashpunk
 		override public function update():void 
 		{
 			resolveShouldVariables();
+		}
+		
+		/**
+		 * Resolves should variables.
+		 * Called at start of update.
+		 */
+		protected function resolveShouldVariables():void {
+			x += shouldMoveX;
+			y += shouldMoveY;
 		}
 		
 		/**

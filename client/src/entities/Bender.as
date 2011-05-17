@@ -30,6 +30,20 @@ package entities {
 			//super
 			super(x, y);
 		}
+			
+		override public function preUpdate():void {
+			super.preUpdate();
+			
+			//collisions against benders
+			if(type != AirBender.COLLISION_TYPE)
+				checkCollide(AirBender.COLLISION_TYPE, didCollideWithBender, true);
+			if (type != EarthBender.COLLISION_TYPE)
+				checkCollide(EarthBender.COLLISION_TYPE, didCollideWithBender, true);
+			if (type != FireBender.COLLISION_TYPE)
+				checkCollide(FireBender.COLLISION_TYPE, didCollideWithBender, true);
+			if (type != WaterBender.COLLISION_TYPE)
+				checkCollide(WaterBender.COLLISION_TYPE, didCollideWithBender, true);
+		}
 		
 		override protected function resetShouldVariables():void {
 			super.resetShouldVariables();
@@ -38,6 +52,30 @@ package entities {
 			shouldStopRight = false;
 			shouldStopUp = false;
 			shouldStopDown = false;
+		}
+		
+		protected function collideShouldStop(hitTest:int):void {
+			if (hitTest == HIT_TOP)
+				shouldStopUp = true;
+			else if (hitTest == HIT_LEFT)
+				shouldStopLeft = true;
+			else if (hitTest == HIT_RIGHT)
+				shouldStopRight = true;
+			else if (hitTest == HIT_BOTTOM)
+				shouldStopDown = true;
+		}
+		
+		override protected function didCollideWithWall(e:Entity, hitTest:int):void {
+			collideShouldStop(hitTest);
+		}
+		
+		protected function didCollideWithBender(e:Entity, hitTest:int):void {
+			collideShouldStop(hitTest);
+		}
+		
+		override public function update():void {
+			super.update();
+			updateMovement();
 		}
 		
 		override protected function resolveShouldVariables():void {
@@ -64,44 +102,6 @@ package entities {
 				if (windForce.y > 0)
 					windForce.y = 0;
 			}
-		}
-		
-		override public function preUpdate():void {
-			super.preUpdate();
-			
-			//collisions against benders
-			if(type != AirBender.COLLISION_TYPE)
-				checkCollide(AirBender.COLLISION_TYPE, didCollideWithBender, true);
-			if (type != EarthBender.COLLISION_TYPE)
-				checkCollide(EarthBender.COLLISION_TYPE, didCollideWithBender, true);
-			if (type != FireBender.COLLISION_TYPE)
-				checkCollide(FireBender.COLLISION_TYPE, didCollideWithBender, true);
-			if (type != WaterBender.COLLISION_TYPE)
-				checkCollide(WaterBender.COLLISION_TYPE, didCollideWithBender, true);
-		}
-		
-		protected function collideShouldStop(hitTest:int):void {
-			if (hitTest == HIT_TOP)
-				shouldStopUp = true;
-			else if (hitTest == HIT_LEFT)
-				shouldStopLeft = true;
-			else if (hitTest == HIT_RIGHT)
-				shouldStopRight = true;
-			else if (hitTest == HIT_BOTTOM)
-				shouldStopDown = true;
-		}
-		
-		override protected function didCollideWithWall(e:Wall, hitTest:int):void {
-			collideShouldStop(hitTest);
-		}
-		
-		protected function didCollideWithBender(e:Bender, hitTest:int):void {
-			collideShouldStop(hitTest);
-		}
-		
-		override public function update():void {
-			super.update();
-			updateMovement();
 		}
 		
 		protected function updateMovement():void {

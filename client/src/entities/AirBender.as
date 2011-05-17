@@ -1,6 +1,8 @@
 package entities {
 	import flashpunk.graphics.Spritemap;
 	import flashpunk.FP;
+	import flashpunk.Entity;
+	
 	import physics.ForceComponent;
 	
 	import general.Utils;
@@ -71,6 +73,35 @@ package entities {
 			shouldBounceHorizontal = false;
 		}
 		
+		override protected function collideShouldStop(hitTest:int):void {
+			if (hitTest == HIT_TOP || hitTest == HIT_BOTTOM)
+				shouldBounceVertical = true;
+			else if (hitTest == HIT_LEFT || hitTest == HIT_RIGHT)
+				shouldBounceHorizontal = true;
+		}
+		
+		override protected function didCollideWithBender(e:Entity, hitTest:int):void {
+			var castedEntity:Bender = e as Bender;
+			
+			if (hitTest == HIT_TOP) {
+				shouldBounceVertical = true;
+				if (isMovingUp())
+					castedEntity.windForce.y += moveForce.y.velocity;
+			}else if (hitTest == HIT_BOTTOM) {
+				shouldBounceVertical = true;
+				if (isMovingDown())
+					castedEntity.windForce.y += moveForce.y.velocity;
+			}else if (hitTest == HIT_LEFT) {
+				shouldBounceHorizontal = true;
+				if (isMovingLeft())
+					castedEntity.windForce.x += moveForce.x.velocity;
+			}else if (hitTest == HIT_RIGHT) {
+				shouldBounceHorizontal = true;
+				if (isMovingRight())
+					castedEntity.windForce.x += moveForce.x.velocity;
+			}
+		}
+		
 		override protected function resolveShouldVariables():void {
 			super.resolveShouldVariables();
 			
@@ -79,33 +110,6 @@ package entities {
 				bounceVertical();
 			if (shouldBounceHorizontal)
 				bounceHorizontal();
-		}
-		
-		override protected function collideShouldStop(hitTest:int):void {
-			if (hitTest == HIT_TOP || hitTest == HIT_BOTTOM)
-				shouldBounceVertical = true;
-			else if (hitTest == HIT_LEFT || hitTest == HIT_RIGHT)
-				shouldBounceHorizontal = true;
-		}
-		
-		override protected function didCollideWithBender(e:Bender, hitTest:int):void {
-			if (hitTest == HIT_TOP) {
-				shouldBounceVertical = true;
-				if (isMovingUp())
-					e.windForce.y += moveForce.y.velocity;
-			}else if (hitTest == HIT_BOTTOM) {
-				shouldBounceVertical = true;
-				if (isMovingDown())
-					e.windForce.y += moveForce.y.velocity;
-			}else if (hitTest == HIT_LEFT) {
-				shouldBounceHorizontal = true;
-				if (isMovingLeft())
-					e.windForce.x += moveForce.x.velocity;
-			}else if (hitTest == HIT_RIGHT) {
-				shouldBounceHorizontal = true;
-				if (isMovingRight())
-					e.windForce.x += moveForce.x.velocity;
-			}
 		}
 		
 		private function bounceVertical():void {

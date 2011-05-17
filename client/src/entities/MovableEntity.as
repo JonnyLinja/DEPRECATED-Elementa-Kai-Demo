@@ -17,26 +17,6 @@ package entities {
 			this.y = y;
 		}
 		
-		override public function preUpdate():void {
-			super.preUpdate();
-			
-			//wall
-			checkCollide(Wall.COLLISION_TYPE, didCollideWithWall, true);
-		}
-		
-		protected function didCollideWithWall(e:Wall, hitTest:int):void {
-			Utils.log("hittest: " + hitTest);
-		}
-		
-		override public function update():void {
-			super.update();
-			
-			//windforce
-			windForce.applyDecel();
-			x += windForce.x;
-			y += windForce.y;
-		}
-		
 		public function isMovingUp():Boolean {
 			return (moveForce.y.velocity < 0);
 		}
@@ -51,6 +31,25 @@ package entities {
 		
 		public function isMovingRight():Boolean {
 			return (moveForce.x.velocity > 0);
+		}
+		
+		override public function preUpdate():void {
+			super.preUpdate();
+			
+			//wall
+			checkCollide(Wall.COLLISION_TYPE, didCollideWithWall, true);
+		}
+		
+		protected function didCollideWithWall(e:Entity, hitTest:int):void {
+		}
+		
+		override public function update():void {
+			super.update();
+			
+			//windforce
+			windForce.applyDecel();
+			x += windForce.x;
+			y += windForce.y;
 		}
 		
 		override public function rollback(oldEntity:Entity):void {
