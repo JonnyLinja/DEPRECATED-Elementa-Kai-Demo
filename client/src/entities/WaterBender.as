@@ -9,9 +9,9 @@ package entities {
 		public static const COLLISION_TYPE:String = "waterbender";
 		
 		//speed
-		private const MAX:Number = 4;
-		private const ACCEL:Number = .25;
-		private const DECEL:Number = .25;
+		private const MAX:Number = 8;
+		private const ACCEL:Number = .5;
+		private const DECEL:Number = .5;
 		
 		//size
 		private const W:uint = 23;

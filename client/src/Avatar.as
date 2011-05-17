@@ -6,7 +6,7 @@
 
 	public class Avatar extends Engine {
 		public function Avatar() {
-			super(640, 480, 50, false);
+			super(640, 480, 31, false);
 			FP.world = new LoginWorld;
 		}
 	}

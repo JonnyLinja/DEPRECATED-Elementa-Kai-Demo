@@ -9,7 +9,7 @@ package entities {
 		public static const COLLISION_TYPE:String = "earthbender";
 		
 		//speed
-		private const MAX:Number = 4;
+		private const MAX:Number = 8;
 		
 		//size
 		private const W:uint = 23;

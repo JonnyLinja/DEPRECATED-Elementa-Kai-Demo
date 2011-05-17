@@ -27,8 +27,8 @@ package worlds {
 		private var m:Message = null; //to send
 		
 		//frames
-		private const FRAME_RATE:uint = 20; //50 fps
-		private const FRAME_DELAY:uint = 3; //how many frames to delay inputs by - has to be at least 1!
+		private const FRAME_RATE:uint = 33; //~30 fps
+		private const FRAME_DELAY:uint = 2; //how many frames to delay inputs by - has to be at least 1!
 		private var trueFrame:uint = 0; //current frame of true
 		private var perceivedFrame:uint = 0; //current frame of perceived
 		private var lastEnemyFrame:uint = 0; //last frame received by enemy

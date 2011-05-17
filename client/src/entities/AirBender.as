@@ -12,9 +12,9 @@ package entities {
 		public static const COLLISION_TYPE:String = "airbender";
 		
 		//speed
-		private const MAX:Number = 15;
-		private const ACCEL:Number = .2;
-		private const DECEL:Number = .1;
+		private const MAX:Number = 25;
+		private const ACCEL:Number = .4;
+		private const DECEL:Number = .2;
 		
 		//size
 		private const W:uint = 25;
