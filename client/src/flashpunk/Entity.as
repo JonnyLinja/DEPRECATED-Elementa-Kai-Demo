@@ -18,27 +18,27 @@ package flashpunk
 		/**
 		 * Collision did not occur
 		 */
-		public const hitNone:int = 0;
+		public const HIT_NONE:int = 0;
 		
 		/**
 		 * Collided along the top side
 		 */
-		public const hitTop:int = 1;
+		public const HIT_TOP:int = 1;
 		
 		/**
 		 * Collided along the bottom side
 		 */
-		public const hitBottom:int = 2;
+		public const HIT_BOTTOM:int = 2;
 		
 		/**
 		 * Collided along the left side
 		 */
-		public const hitLeft:int = 3;
+		public const HIT_LEFT:int = 3;
 		
 		/**
 		 * Collided along the right side
 		 */
-		public const hitRight:int = 4;
+		public const HIT_RIGHT:int = 4;
 		
 		/**
 		 * How far the Entity should move along the X axis next update
@@ -504,12 +504,12 @@ package flashpunk
 					//left
 					if(preventOverlap)
 						shouldMoveX -= intersect.x;
-					return hitRight;
+					return HIT_RIGHT;
 				}else {
 					//right
 					if(preventOverlap)
 						shouldMoveX += intersect.x;
-					return hitLeft;
+					return HIT_LEFT;
 				}
 			}else {
 				//vertical
@@ -517,12 +517,12 @@ package flashpunk
 					//up
 					if(preventOverlap)
 						shouldMoveY -= intersect.y;
-					return hitBottom;
+					return HIT_BOTTOM;
 				}else {
 					//down
 					if(preventOverlap)
 						shouldMoveY += intersect.y;
-					return hitTop;
+					return HIT_TOP;
 				}
 			}
 		}

@@ -35,7 +35,7 @@ package general {
 		}
 		
 		public static function isBender(e:MovableEntity):Boolean {
-			return (e.type == WaterBender.collisionType || e.type == FireBender.collisionType || e.type == EarthBender.collisionType || e.type == AirBender.collisionType);
+			return (e.type == WaterBender.COLLISION_TYPE || e.type == FireBender.COLLISION_TYPE || e.type == EarthBender.COLLISION_TYPE || e.type == AirBender.COLLISION_TYPE);
 		}
 		
 		public static function negative(n:Number):Number {

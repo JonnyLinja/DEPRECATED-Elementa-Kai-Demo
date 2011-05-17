@@ -2,7 +2,7 @@ package entities {
 	import flashpunk.Entity;
 	
 	public class Wall extends Entity {
-		public static const collisionType:String = "wall";
+		public static const COLLISION_TYPE:String = "wall";
 		
 		public function Wall(x:Number, y:Number, width:Number, height:Number) {
 			super(x, y);
@@ -10,7 +10,7 @@ package entities {
 			this.width = width;
 			this.height = height;
 			
-			type = Wall.collisionType;
+			type = Wall.COLLISION_TYPE;
 		}
 	}
 }

@@ -21,7 +21,7 @@ package entities {
 			super.preUpdate();
 			
 			//wall
-			checkCollide(Wall.collisionType, didCollideWithWall, true);
+			checkCollide(Wall.COLLISION_TYPE, didCollideWithWall, true);
 		}
 		
 		protected function didCollideWithWall(e:Wall, hitTest:int):void {

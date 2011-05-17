@@ -70,24 +70,24 @@ package entities {
 			super.preUpdate();
 			
 			//collisions against benders
-			if(type != AirBender.collisionType)
-				checkCollide(AirBender.collisionType, didCollideWithBender, true);
-			if (type != EarthBender.collisionType)
-				checkCollide(EarthBender.collisionType, didCollideWithBender, true);
-			if (type != FireBender.collisionType)
-				checkCollide(FireBender.collisionType, didCollideWithBender, true);
-			if (type != WaterBender.collisionType)
-				checkCollide(WaterBender.collisionType, didCollideWithBender, true);
+			if(type != AirBender.COLLISION_TYPE)
+				checkCollide(AirBender.COLLISION_TYPE, didCollideWithBender, true);
+			if (type != EarthBender.COLLISION_TYPE)
+				checkCollide(EarthBender.COLLISION_TYPE, didCollideWithBender, true);
+			if (type != FireBender.COLLISION_TYPE)
+				checkCollide(FireBender.COLLISION_TYPE, didCollideWithBender, true);
+			if (type != WaterBender.COLLISION_TYPE)
+				checkCollide(WaterBender.COLLISION_TYPE, didCollideWithBender, true);
 		}
 		
 		protected function collideShouldStop(hitTest:int):void {
-			if (hitTest == hitTop)
+			if (hitTest == HIT_TOP)
 				shouldStopUp = true;
-			else if (hitTest == hitLeft)
+			else if (hitTest == HIT_LEFT)
 				shouldStopLeft = true;
-			else if (hitTest == hitRight)
+			else if (hitTest == HIT_RIGHT)
 				shouldStopRight = true;
-			else if (hitTest == hitBottom)
+			else if (hitTest == HIT_BOTTOM)
 				shouldStopDown = true;
 		}
 		

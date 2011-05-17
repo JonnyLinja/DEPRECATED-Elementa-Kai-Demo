@@ -6,21 +6,21 @@ package entities {
 	
 	public class FireBender extends Bender {
 		//collision
-		public static const collisionType:String = "firebender";
+		public static const COLLISION_TYPE:String = "firebender";
+		
+		//speed
+		private const MAX:Number = 7;
+		private const ACCEL:Number = .25;
+		private const DECEL:Number = .5;
 		
 		//size
-		private const w:uint = 25;
-		private const h:uint = 32;
+		private const W:uint = 25;
+		private const H:uint = 32;
 		
 		//sprite
 		[Embed(source = '../../images/firebender.PNG')]
-		private const image:Class; 
-		private var sprite_map:Spritemap = new Spritemap(image, w, h);
-		
-		//speed
-		private const max:Number = 7;
-		private const accel:Number = .25;
-		private const decel:Number = .5;
+		private static const image:Class; 
+		private var sprite_map:Spritemap = new Spritemap(image, W, H);
 		
 		public function FireBender(x:Number = 0, y:Number = 0) {
 			//super
@@ -30,30 +30,30 @@ package entities {
 			graphic = sprite_map;
 			
 			//size
-			width = w;
-			height = h;
+			width = W;
+			height = H;
 			
 			//collision type
-			type = FireBender.collisionType;
+			type = FireBender.COLLISION_TYPE;
 			
 			//max
-			moveForce.max = max;
-			leftForce.maxVelocity = max;
-			rightForce.maxVelocity = max;
-			upForce.maxVelocity = max;
-			downForce.maxVelocity = max;
+			moveForce.max = MAX;
+			leftForce.maxVelocity = MAX;
+			rightForce.maxVelocity = MAX;
+			upForce.maxVelocity = MAX;
+			downForce.maxVelocity = MAX;
 			
 			//accel
-			leftForce.acceleration = -accel;
-			rightForce.acceleration = accel;
-			upForce.acceleration = -accel;
-			downForce.acceleration = accel;
+			leftForce.acceleration = -ACCEL;
+			rightForce.acceleration = ACCEL;
+			upForce.acceleration = -ACCEL;
+			downForce.acceleration = ACCEL;
 			
 			//decel
-			leftForce.deceleration = decel;
-			rightForce.deceleration = -decel;
-			upForce.deceleration = decel;
-			downForce.deceleration = -decel;
+			leftForce.deceleration = DECEL;
+			rightForce.deceleration = -DECEL;
+			upForce.deceleration = DECEL;
+			downForce.deceleration = -DECEL;
 			
 			//temp animation test
 			sprite_map.add("walkdown", [0, 1, 2], 20, true);

@@ -7,21 +7,21 @@ package entities {
 	
 	public class AirBender extends Bender {
 		//collision
-		public static const collisionType:String = "airbender";
+		public static const COLLISION_TYPE:String = "airbender";
+		
+		//speed
+		private const MAX:Number = 15;
+		private const ACCEL:Number = .2;
+		private const DECEL:Number = .1;
 		
 		//size
-		private const w:uint = 25;
-		private const h:uint = 32;
+		private const W:uint = 25;
+		private const H:uint = 32;
 		
 		//sprite
 		[Embed(source = '../../images/airbender.PNG')]
-		private const image:Class; 
-		private var sprite_map:Spritemap = new Spritemap(image, w, h);
-		
-		//speed
-		private const max:Number = 15;
-		private const accel:Number = .2;
-		private const decel:Number = .1;
+		private static const image:Class; 
+		private var sprite_map:Spritemap = new Spritemap(image, W, H);
 		
 		//bounce
 		private var shouldBounceVertical:Boolean;
@@ -35,30 +35,30 @@ package entities {
 			graphic = sprite_map;
 			
 			//size
-			width = w;
-			height = h;
+			width = W;
+			height = H;
 			
 			//collision type
-			type = AirBender.collisionType;
+			type = AirBender.COLLISION_TYPE;
 			
 			//max
-			moveForce.max = max;
-			leftForce.maxVelocity = max;
-			rightForce.maxVelocity = max;
-			upForce.maxVelocity = max;
-			downForce.maxVelocity = max;
+			moveForce.max = MAX;
+			leftForce.maxVelocity = MAX;
+			rightForce.maxVelocity = MAX;
+			upForce.maxVelocity = MAX;
+			downForce.maxVelocity = MAX;
 			
 			//accel
-			leftForce.acceleration = -accel;
-			rightForce.acceleration = accel;
-			upForce.acceleration = -accel;
-			downForce.acceleration = accel;
+			leftForce.acceleration = -ACCEL;
+			rightForce.acceleration = ACCEL;
+			upForce.acceleration = -ACCEL;
+			downForce.acceleration = ACCEL;
 			
 			//decel
-			leftForce.deceleration = decel;
-			rightForce.deceleration = -decel;
-			upForce.deceleration = decel;
-			downForce.deceleration = -decel;
+			leftForce.deceleration = DECEL;
+			rightForce.deceleration = -DECEL;
+			upForce.deceleration = DECEL;
+			downForce.deceleration = -DECEL;
 			
 			//temp animation test
 			sprite_map.add("walkdown", [0, 1, 2], 20, true);
@@ -82,26 +82,26 @@ package entities {
 		}
 		
 		override protected function collideShouldStop(hitTest:int):void {
-			if (hitTest == hitTop || hitTest == hitBottom)
+			if (hitTest == HIT_TOP || hitTest == HIT_BOTTOM)
 				shouldBounceVertical = true;
-			else if (hitTest == hitLeft || hitTest == hitRight)
+			else if (hitTest == HIT_LEFT || hitTest == HIT_RIGHT)
 				shouldBounceHorizontal = true;
 		}
 		
 		override protected function didCollideWithBender(e:Bender, hitTest:int):void {
-			if (hitTest == hitTop) {
+			if (hitTest == HIT_TOP) {
 				shouldBounceVertical = true;
 				if (isMovingUp())
 					e.windForce.y += moveForce.y.velocity;
-			}else if (hitTest == hitBottom) {
+			}else if (hitTest == HIT_BOTTOM) {
 				shouldBounceVertical = true;
 				if (isMovingDown())
 					e.windForce.y += moveForce.y.velocity;
-			}else if (hitTest == hitLeft) {
+			}else if (hitTest == HIT_LEFT) {
 				shouldBounceHorizontal = true;
 				if (isMovingLeft())
 					e.windForce.x += moveForce.x.velocity;
-			}else if (hitTest == hitRight) {
+			}else if (hitTest == HIT_RIGHT) {
 				shouldBounceHorizontal = true;
 				if (isMovingRight())
 					e.windForce.x += moveForce.x.velocity;

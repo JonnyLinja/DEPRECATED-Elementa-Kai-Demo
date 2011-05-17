@@ -1,6 +1,6 @@
 package physics {
 	public class WindForce {
-		private static const decel:Number = .1;
+		private static const DECEL:Number = .1;
 		protected var vector:ForceVector = new ForceVector();
 		
 		public function WindForce() {
@@ -8,7 +8,7 @@ package physics {
 		}
 		
 		private function recalculate():void {
-			vector.calculateDecelerationBasedOnVelocity(WindForce.decel);
+			vector.calculateDecelerationBasedOnVelocity(WindForce.DECEL);
 		}
 		
 		public function get x():Number {

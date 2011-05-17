@@ -6,19 +6,19 @@ package entities {
 	
 	public class EarthBender extends Bender {
 		//collision
-		public static const collisionType:String = "earthbender";
+		public static const COLLISION_TYPE:String = "earthbender";
+		
+		//speed
+		private const MAX:Number = 4;
 		
 		//size
-		private const w:uint = 23;
-		private const h:uint = 32;
+		private const W:uint = 23;
+		private const H:uint = 32;
 		
 		//sprite
 		[Embed(source = '../../images/earthbender.PNG')]
-		private const image:Class; 
-		private var sprite_map:Spritemap = new Spritemap(image, w, h);
-		
-		//speed
-		private const max:Number = 4;
+		private static const image:Class; 
+		private var sprite_map:Spritemap = new Spritemap(image, W, H);
 		
 		public function EarthBender(x:Number = 0, y:Number = 0) {
 			//super
@@ -28,14 +28,14 @@ package entities {
 			graphic = sprite_map;
 			
 			//size
-			width = w;
-			height = h;
+			width = W;
+			height = H;
 			
 			//collision type
-			type = EarthBender.collisionType;
+			type = EarthBender.COLLISION_TYPE;
 			
 			//max
-			moveForce.max = max;
+			moveForce.max = MAX;
 			
 			//temp animation test
 			sprite_map.add("walkdown", [0, 1, 2], 20, true);
@@ -45,17 +45,17 @@ package entities {
 		override protected function updateMovement():void {
 			//horizontal
 			if (moveLeft && !moveRight)
-				moveForce.x.velocity = -max;
+				moveForce.x.velocity = -MAX;
 			else if (moveRight && !moveLeft)
-				moveForce.x.velocity = max;
+				moveForce.x.velocity = MAX;
 			else
 				moveForce.x.velocity = 0;
 			
 			//vertical
 			if (moveUp && !moveDown)
-				moveForce.y.velocity = -max;
+				moveForce.y.velocity = -MAX;
 			else if (moveDown && !moveUp)
-				moveForce.y.velocity = max;
+				moveForce.y.velocity = MAX;
 			else
 				moveForce.y.velocity = 0;
 			

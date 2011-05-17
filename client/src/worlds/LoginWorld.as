@@ -9,7 +9,7 @@ package worlds {
 	
 	public class LoginWorld extends World {
 		private var pokeStart:int;
-		private const local:Boolean = false;
+		private const LOCAL:Boolean = false;
 		
 		public function LoginWorld() {
 		}
@@ -18,7 +18,7 @@ package worlds {
 			//Connect and join the room
 			PlayerIO.connect(
 				FP.stage,								//Referance to stage
-				Net.gameID,								//Game id (Get your own at playerio.com. 1: Create user, 2:Goto admin pannel, 3:Create game, 4: Copy game id inside the "")
+				Net.GAME_ID,								//Game id (Get your own at playerio.com. 1: Create user, 2:Goto admin pannel, 3:Create game, 4: Copy game id inside the "")
 				"public",								//Connection id, default is public
 				"GuestUser",							//Username
 				"",										//User auth. Can be left blank if authentication is disabled on connection
@@ -44,7 +44,7 @@ package worlds {
 		 */
 		private function handleConnect(client:Client):void {
 			//local
-			if(local)
+			if(LOCAL)
 				client.multiplayer.developmentServer = "localhost:8184";
 			
 			//log
@@ -52,8 +52,8 @@ package worlds {
 			
 			//join lobby
 			client.multiplayer.createJoinRoom(
-				Net.roomLobby,						//Room id. If set to null a random roomid is used
-				Net.gameType,						//The game type started on the server
+				Net.ROOM_LOBBY,						//Room id. If set to null a random roomid is used
+				Net.GAME_TYPE,						//The game type started on the server
 				true,								//Should the room be visible in the lobby?
 				{},									//Room data. This data is returned to lobby list. Variabels can be modifed on the server
 				{},									//User join data
@@ -79,12 +79,12 @@ package worlds {
 			Net.conn = conn;
 			
 			//message handlers
-			Net.conn.addMessageHandler(Net.messageRoomChange, handleRoomChange);
-			Net.conn.addMessageHandler(Net.messagePoke, handlePoke);
+			Net.conn.addMessageHandler(Net.MESSAGE_ROOM_CHANGE, handleRoomChange);
+			Net.conn.addMessageHandler(Net.MESSAGE_POKE, handlePoke);
 			
 			//send ping request
 			pokeStart = getTimer();
-			Net.conn.send(Net.messagePoke);
+			Net.conn.send(Net.MESSAGE_POKE);
 		}
 		
 		/**
@@ -100,7 +100,7 @@ package worlds {
 			//resend ping request
 			if (flash.utils.getQualifiedClassName( FP.world ) == "worlds::LoginWorld") {
 				pokeStart = currentTime;
-				Net.conn.send(Net.messagePoke);
+				Net.conn.send(Net.MESSAGE_POKE);
 			}
 		}
 		
@@ -112,8 +112,8 @@ package worlds {
 		 */
 		private function handleRoomChange(m:Message):void {
 			//kill old connection
-			Net.conn.removeMessageHandler(Net.messagePoke, null);
-			Net.conn.removeMessageHandler(Net.messageRoomChange, null);
+			Net.conn.removeMessageHandler(Net.MESSAGE_POKE, null);
+			Net.conn.removeMessageHandler(Net.MESSAGE_ROOM_CHANGE, null);
 			Net.conn.disconnect();
 			Net.conn = null;
 			
@@ -124,7 +124,7 @@ package worlds {
 			//join room
 			Net.client.multiplayer.createJoinRoom(
 				newRoom,							//Room id. If set to null a random roomid is used
-				Net.gameType,						//The game type started on the server
+				Net.GAME_TYPE,						//The game type started on the server
 				true,								//Should the room be visible in the lobby?
 				{},									//Room data. This data is returned to lobby list. Variabels can be modifed on the server
 				{},									//User join data
@@ -141,7 +141,7 @@ package worlds {
 			Net.conn = conn;
 			
 			//message handlers
-			Net.conn.addMessageHandler(Net.messageStart, handleStart);
+			Net.conn.addMessageHandler(Net.MESSAGE_START, handleStart);
 		}
 		
 		/**

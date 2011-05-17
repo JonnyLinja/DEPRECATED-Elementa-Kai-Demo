@@ -27,8 +27,8 @@ package worlds {
 		private var m:Message = null; //to send
 		
 		//frames
-		private const frameRate:uint = 20; //50 fps
-		private const frameDelay:uint = 3; //how many frames to delay inputs by - has to be at least 1!
+		private const FRAME_RATE:uint = 20; //50 fps
+		private const FRAME_DELAY:uint = 3; //how many frames to delay inputs by - has to be at least 1!
 		private var trueFrame:uint = 0; //current frame of true
 		private var perceivedFrame:uint = 0; //current frame of perceived
 		private var lastEnemyFrame:uint = 0; //last frame received by enemy
@@ -54,7 +54,7 @@ package worlds {
 			nextFrameTime = FP.time;
 			
 			//message handler
-			Net.conn.addMessageHandler(Net.messageCommands, receiveEnemyCommands);
+			Net.conn.addMessageHandler(Net.MESSAGE_COMMANDS, receiveEnemyCommands);
 		}
 		
 		/**
@@ -123,7 +123,7 @@ package worlds {
 			//instantiate message and add frame/mouse
 			if (!m) {
 				//message
-				m = Net.conn.createMessage(Net.messageCommands);
+				m = Net.conn.createMessage(Net.MESSAGE_COMMANDS);
 				
 				//frame
 				m.add(c.frame-lastMyFrame);
@@ -135,7 +135,7 @@ package worlds {
 			}
 				
 			//add command type to message
-			m.add(c.command);
+			m.add(c.type);
 		}
 		
 		/**
@@ -172,7 +172,7 @@ package worlds {
 		 * Updates true, perceived, and inputs
 		 */
 		override public function update():void {
-			FP.elapsed = frameRate / 1000;
+			FP.elapsed = FRAME_RATE / 1000;
 			updateTrueWorld();
 			updatePerceivedWorld();
 			updateInputs();
@@ -218,7 +218,7 @@ package worlds {
 						shouldRollback = true;
 						
 						//execute command
-						trueWorld.executeCommand(commandToCheck.player, commandToCheck.command);
+						trueWorld.executeCommand(commandToCheck);
 						
 						//increment true command
 						trueCommand = commandToCheck;
@@ -259,7 +259,7 @@ package worlds {
 							break;
 						
 						//execute command
-						perceivedWorld.executeCommand(commandToCheck.player, commandToCheck.command);
+						perceivedWorld.executeCommand(commandToCheck);
 						
 						//increment perceived command
 						perceivedCommand = commandToCheck;
@@ -304,7 +304,7 @@ package worlds {
 							break;
 						
 						//execute command
-						perceivedWorld.executeCommand(commandToCheck.player, commandToCheck.command);
+						perceivedWorld.executeCommand(commandToCheck);
 						
 						//increment perceived command
 						perceivedCommand = commandToCheck;
@@ -318,7 +318,7 @@ package worlds {
 				perceivedFrame++;
 				
 				//increment next frame
-				nextFrameTime += frameRate;
+				nextFrameTime += FRAME_RATE;
 			}while (FP.time >= nextFrameTime);
 		}
 		
@@ -334,25 +334,25 @@ package worlds {
 				//left
 				if (a) {
 					a = false;
-					addMyCommand(new Command(isP1, Command.A, perceivedFrame+frameDelay));
+					addMyCommand(new Command(isP1, Command.A, perceivedFrame+FRAME_DELAY));
 				}
 				
 				//right
 				if (d) {
 					d = false;
-					addMyCommand(new Command(isP1, Command.D, perceivedFrame+frameDelay));
+					addMyCommand(new Command(isP1, Command.D, perceivedFrame+FRAME_DELAY));
 				}
 				
 				//up
 				if (w) {
 					w = false;
-					addMyCommand(new Command(isP1, Command.W, perceivedFrame+frameDelay));
+					addMyCommand(new Command(isP1, Command.W, perceivedFrame+FRAME_DELAY));
 				}
 				
 				//down
 				if (s) {
 					s = false;
-					addMyCommand(new Command(isP1, Command.S, perceivedFrame+frameDelay));
+					addMyCommand(new Command(isP1, Command.S, perceivedFrame+FRAME_DELAY));
 				}
 				
 				//reset
@@ -361,25 +361,25 @@ package worlds {
 				//left
 				if(Input.check(Key.A) != a) {
 					a = !a;
-					addMyCommand(new Command(isP1, Command.A, perceivedFrame+frameDelay));
+					addMyCommand(new Command(isP1, Command.A, perceivedFrame+FRAME_DELAY));
 				}
 				
 				//right
 				if(Input.check(Key.D) != d) {
 					d = !d;
-					addMyCommand(new Command(isP1, Command.D, perceivedFrame+frameDelay));
+					addMyCommand(new Command(isP1, Command.D, perceivedFrame+FRAME_DELAY));
 				}
 				
 				//up
 				if(Input.check(Key.W) != w) {
 					w = !w;
-					addMyCommand(new Command(isP1, Command.W, perceivedFrame+frameDelay));
+					addMyCommand(new Command(isP1, Command.W, perceivedFrame+FRAME_DELAY));
 				}
 				
 				//down
 				if(Input.check(Key.S) != s) {
 					s = !s;
-					addMyCommand(new Command(isP1, Command.S, perceivedFrame+frameDelay));
+					addMyCommand(new Command(isP1, Command.S, perceivedFrame+FRAME_DELAY));
 				}
 			}
 			
