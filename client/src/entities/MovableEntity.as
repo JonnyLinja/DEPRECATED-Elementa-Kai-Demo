@@ -11,6 +11,9 @@ package entities {
 		public var moveForce:ForceVector = new ForceVector();
 		public var windForce:WindForce = new WindForce();
 		
+		//overlap
+		protected var preventWallOverlap:Boolean = true;
+		
 		public function MovableEntity(x:Number = 0, y:Number = 0) {
 			//position
 			this.x = x;
@@ -37,7 +40,7 @@ package entities {
 			super.preUpdate();
 			
 			//wall
-			checkCollide(Wall.COLLISION_TYPE, didCollideWithWall, true);
+			checkCollide(Wall.COLLISION_TYPE, preventWallOverlap, didCollideWithWall);
 		}
 		
 		protected function didCollideWithWall(e:Entity, hitTest:int):void {

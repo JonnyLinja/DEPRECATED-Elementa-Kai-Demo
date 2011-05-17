@@ -455,7 +455,7 @@ package flashpunk
 		 * @param	callback
 		 * @param	preventOverlap
 		 */
-		protected function checkCollide(type:String, callback:Function, preventOverlap:Boolean=false):void {
+		protected function checkCollide(type:String, preventOverlap:Boolean=false, callback:Function=null):void {
 			//declare variables
 			var collisionList:Vector.<Entity> = new Vector.<Entity>();
 			
@@ -464,7 +464,8 @@ package flashpunk
 			
 			//loop through vector
 			for each (var e:Entity in collisionList) {
-				callback(e, hitTest(e, preventOverlap)); //should I send the intersection rectangle as well?
+				if(callback != null)
+					callback(e, hitTest(e, preventOverlap)); //should I send the intersection rectangle as well?
 			}
 		}
 		

@@ -36,13 +36,13 @@ package entities {
 			
 			//collisions against benders
 			if(type != AirBender.COLLISION_TYPE)
-				checkCollide(AirBender.COLLISION_TYPE, didCollideWithBender, true);
+				checkCollide(AirBender.COLLISION_TYPE, true, didCollideWithBender);
 			if (type != EarthBender.COLLISION_TYPE)
-				checkCollide(EarthBender.COLLISION_TYPE, didCollideWithBender, true);
+				checkCollide(EarthBender.COLLISION_TYPE, true, didCollideWithBender);
 			if (type != FireBender.COLLISION_TYPE)
-				checkCollide(FireBender.COLLISION_TYPE, didCollideWithBender, true);
+				checkCollide(FireBender.COLLISION_TYPE, true, didCollideWithBender);
 			if (type != WaterBender.COLLISION_TYPE)
-				checkCollide(WaterBender.COLLISION_TYPE, didCollideWithBender, true);
+				checkCollide(WaterBender.COLLISION_TYPE, true, didCollideWithBender);
 		}
 		
 		override protected function resetShouldVariables():void {
