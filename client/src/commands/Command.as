@@ -18,7 +18,6 @@ package commands {
 		public var frame:uint;
 		public var x:Number; //number type for speed purposes?
 		public var y:Number; //number type for speed purposes?
-		public var usesPoint:Boolean;
 		
 		//linked list
 		public var next:Command;
@@ -33,11 +32,10 @@ package commands {
 		 * @param	x
 		 * @param	y
 		 */
-		public function Command(player:Boolean, command:int, frame:uint, usesPoint:Boolean=false, x:Number=0, y:Number=0) {
+		public function Command(player:Boolean, command:int, frame:uint, x:Number=0, y:Number=0) {
 			this.player = player;
 			this.type = command;
 			this.frame = frame;
-			this.usesPoint = usesPoint;
 			this.x = x;
 			this.y = y;
 		}

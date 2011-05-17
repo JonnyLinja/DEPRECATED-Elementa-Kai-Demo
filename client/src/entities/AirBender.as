@@ -1,4 +1,6 @@
 package entities {
+	import flash.geom.Point;
+	
 	import flashpunk.graphics.Spritemap;
 	import flashpunk.FP;
 	import flashpunk.Entity;
@@ -73,29 +75,29 @@ package entities {
 			shouldBounceHorizontal = false;
 		}
 		
-		override protected function collideShouldStop(hitTest:int):void {
-			if (hitTest == HIT_TOP || hitTest == HIT_BOTTOM)
+		override protected function collideShouldStop(hitTestResult:int):void {
+			if (hitTestResult == HIT_TOP || hitTestResult == HIT_BOTTOM)
 				shouldBounceVertical = true;
-			else if (hitTest == HIT_LEFT || hitTest == HIT_RIGHT)
+			else if (hitTestResult == HIT_LEFT || hitTestResult == HIT_RIGHT)
 				shouldBounceHorizontal = true;
 		}
 		
-		override protected function didCollideWithBender(e:Entity, hitTest:int):void {
+		override protected function didCollideWithBender(e:Entity, hitTestResult:int, intersectSize:Point):void {
 			var castedEntity:Bender = e as Bender;
 			
-			if (hitTest == HIT_TOP) {
+			if (hitTestResult == HIT_TOP) {
 				shouldBounceVertical = true;
 				if (isMovingUp())
 					castedEntity.windForce.y += moveForce.y.velocity;
-			}else if (hitTest == HIT_BOTTOM) {
+			}else if (hitTestResult == HIT_BOTTOM) {
 				shouldBounceVertical = true;
 				if (isMovingDown())
 					castedEntity.windForce.y += moveForce.y.velocity;
-			}else if (hitTest == HIT_LEFT) {
+			}else if (hitTestResult == HIT_LEFT) {
 				shouldBounceHorizontal = true;
 				if (isMovingLeft())
 					castedEntity.windForce.x += moveForce.x.velocity;
-			}else if (hitTest == HIT_RIGHT) {
+			}else if (hitTestResult == HIT_RIGHT) {
 				shouldBounceHorizontal = true;
 				if (isMovingRight())
 					castedEntity.windForce.x += moveForce.x.velocity;

@@ -1,5 +1,8 @@
 package entities {
+	import flash.geom.Point;
+	
 	import flashpunk.Entity;
+	import flashpunk.FP;
 	
 	import physics.ForceVector;
 	import physics.WindForce;
@@ -36,6 +39,22 @@ package entities {
 			return (moveForce.x.velocity > 0);
 		}
 		
+		public function isOffScreenHorizontal():Boolean {
+			if (x < 0)
+				return true;
+			if (x + width > FP.width)
+				return true;
+			return false;
+		}
+		
+		public function isOffScreenVertical():Boolean {
+			if (y < 0)
+				return true;
+			if (y + height > FP.height)
+				return true;
+			return false;
+		}
+		
 		override public function preUpdate():void {
 			super.preUpdate();
 			
@@ -43,7 +62,7 @@ package entities {
 			checkCollide(Wall.COLLISION_TYPE, preventWallOverlap, didCollideWithWall);
 		}
 		
-		protected function didCollideWithWall(e:Entity, hitTest:int):void {
+		protected function didCollideWithWall(e:Entity, hitTestResult:int, intersectSize:Point):void {
 		}
 		
 		override public function update():void {

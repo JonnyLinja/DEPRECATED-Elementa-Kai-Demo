@@ -6,6 +6,7 @@ package worlds {
 	import entities.FireBender;
 	import entities.Wall;
 	import entities.WaterBender;
+	import entities.Boulder;
 	
 	import flashpunk.World;
 	
@@ -22,7 +23,7 @@ package worlds {
 		
 		public function GameWorld() {
 			player1 = new AirBender(200, 10);
-			player2 = new WaterBender(150, 10);
+			player2 = new EarthBender(150, 10);
 			add(player1);
 			add(player2);
 			add(new Wall( -FP.width, -FP.height, FP.width * 3, FP.height)); //top
@@ -57,7 +58,19 @@ package worlds {
 					player1.moveDown = !player1.moveDown;
 				else
 					player2.moveDown = !player2.moveDown;
+			}else if (command.type == Command.MOUSE_TOGGLE) {
+				//create boulder
+				//temporary, everyone can do it on both mouse down AND up
+				var boulder:Boulder = create(Boulder, true) as Boulder;
+				boulder.x = command.x - boulder.halfWidth;
+				boulder.y = command.y - boulder.halfHeight;
 			}
+		}
+		
+		override public function update():void {
+			super.update();
+			
+			updateLists();
 		}
 		
 		public function executeCommandWithPoint(isP1:Boolean, command:int, x:Number, y:Number):void {

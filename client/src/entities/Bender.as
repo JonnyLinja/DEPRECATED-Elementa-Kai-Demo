@@ -1,4 +1,5 @@
 package entities {
+	import flash.geom.Point;
 	import physics.ForceVector;
 	import physics.ForceComponent;
 	
@@ -26,6 +27,9 @@ package entities {
 		public var shouldStopUp:Boolean;
 		public var shouldStopDown:Boolean;
 		
+		//overlap
+		protected var preventBoulderOverlap:Boolean = true;
+		
 		public function Bender(x:Number = 0, y:Number = 0) {
 			//super
 			super(x, y);
@@ -43,6 +47,9 @@ package entities {
 				checkCollide(FireBender.COLLISION_TYPE, true, didCollideWithBender);
 			if (type != WaterBender.COLLISION_TYPE)
 				checkCollide(WaterBender.COLLISION_TYPE, true, didCollideWithBender);
+			
+			//collisions against still boulders
+			checkCollide(Boulder.COLLISION_TYPE_BOULDER_STILL, preventBoulderOverlap, didCollideWithStillBoulder);
 		}
 		
 		override protected function resetShouldVariables():void {
@@ -54,23 +61,27 @@ package entities {
 			shouldStopDown = false;
 		}
 		
-		protected function collideShouldStop(hitTest:int):void {
-			if (hitTest == HIT_TOP)
+		protected function collideShouldStop(hitTestResult:int):void {
+			if (hitTestResult == HIT_TOP)
 				shouldStopUp = true;
-			else if (hitTest == HIT_LEFT)
+			else if (hitTestResult == HIT_LEFT)
 				shouldStopLeft = true;
-			else if (hitTest == HIT_RIGHT)
+			else if (hitTestResult == HIT_RIGHT)
 				shouldStopRight = true;
-			else if (hitTest == HIT_BOTTOM)
+			else if (hitTestResult == HIT_BOTTOM)
 				shouldStopDown = true;
 		}
 		
-		override protected function didCollideWithWall(e:Entity, hitTest:int):void {
-			collideShouldStop(hitTest);
+		override protected function didCollideWithWall(e:Entity, hitTestResult:int, intersectSize:Point):void {
+			collideShouldStop(hitTestResult);
 		}
 		
-		protected function didCollideWithBender(e:Entity, hitTest:int):void {
-			collideShouldStop(hitTest);
+		protected function didCollideWithBender(e:Entity, hitTestResult:int, intersectSize:Point):void {
+			collideShouldStop(hitTestResult);
+		}
+		
+		protected function didCollideWithStillBoulder(e:Entity, hitTestResult:int, intersectSize:Point):void {
+			collideShouldStop(hitTestResult);
 		}
 		
 		override public function update():void {

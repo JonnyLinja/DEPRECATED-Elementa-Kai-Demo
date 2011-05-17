@@ -455,17 +455,20 @@ package flashpunk
 		 * @param	callback
 		 * @param	preventOverlap
 		 */
-		protected function checkCollide(type:String, preventOverlap:Boolean=false, callback:Function=null):void {
+		public function checkCollide(type:String, preventOverlap:Boolean=false, callback:Function=null):void {
 			//declare variables
 			var collisionList:Vector.<Entity> = new Vector.<Entity>();
+			var intersect:Point = null;
 			
 			//populate vector
 			collideInto(type, x, y, collisionList);
 			
 			//loop through vector
 			for each (var e:Entity in collisionList) {
-				if(callback != null)
-					callback(e, hitTest(e, preventOverlap)); //should I send the intersection rectangle as well?
+				if (callback != null) {
+					intersect = getIntersectRect(e);
+					callback(e, hitTest(e, preventOverlap, intersect), intersect);
+				}
 			}
 		}
 		
@@ -477,8 +480,9 @@ package flashpunk
 		 * @param	preventOverlap
 		 * @return
 		 */
-		protected function hitTest(e:Entity, preventOverlap:Boolean=false):int {
-			var intersect:Point = getIntersectRect(e);
+		public function hitTest(e:Entity, preventOverlap:Boolean=false, intersect:Point=null):int {
+			if (!intersect)
+				intersect = getIntersectRect(e);
 			//ratio - may not need, might be able to fudge with 1-1 ratio
 			//right now set to use bigger of the two
 			//could set to use smaller no problem

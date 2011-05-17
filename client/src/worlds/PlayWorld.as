@@ -47,6 +47,7 @@ package worlds {
 		private var d:Boolean = false;
 		private var w:Boolean = false;
 		private var s:Boolean = false;
+		private var mouse:Boolean = false;
 		
 		public function PlayWorld(isP1:Boolean) {
 			//set variables
@@ -130,8 +131,8 @@ package worlds {
 				lastMyFrame = c.frame;
 				
 				//mouse
-				//m.add(Input.mouseX);
-				//m.add(Input.mouseY);
+				m.add(Input.mouseX);
+				m.add(Input.mouseY);
 			}
 				
 			//add command type to message
@@ -147,8 +148,8 @@ package worlds {
 			//declare variables
 			var length:int = m.length;
 			var c:int;
-			//var mouseX:int = m.getInt(1);
-			//var mouseY:int = m.getInt(2);
+			var mouseX:int = m.getInt(1);
+			var mouseY:int = m.getInt(2);
 			
 			//increment true max
 			lastEnemyFrame += m.getUInt(0);
@@ -156,14 +157,18 @@ package worlds {
 			Utils.log("frame difference is " + (perceivedFrame - lastEnemyFrame));
 			
 			//loop insert new command
-			for (var pos:int=/*3*/1; pos<length; pos++) {
+			for (var pos:int=1; pos<length; pos++) {
 				c = m.getInt(pos);
 				switch(c) {
 					case Command.W:
 					case Command.A:
 					case Command.S:
 					case Command.D:
-						insertCommand(new Command(!isP1, c, lastEnemyFrame, false));
+						insertCommand(new Command(!isP1, c, lastEnemyFrame));
+						break;
+					case Command.MOUSE_TOGGLE:
+						insertCommand(new Command(!isP1, c, lastEnemyFrame, mouseX, mouseY));
+						break;
 				}
 			}
 		}
@@ -355,6 +360,12 @@ package worlds {
 					addMyCommand(new Command(isP1, Command.S, perceivedFrame+FRAME_DELAY));
 				}
 				
+				//mouse
+				if (mouse) {
+					mouse = false;
+					addMyCommand(new Command(isP1, Command.MOUSE_TOGGLE, perceivedFrame+FRAME_DELAY, Input.mouseX, Input.mouseY));
+				}
+				
 				//reset
 				lostWindowFocus = false;
 			}else {
@@ -380,6 +391,12 @@ package worlds {
 				if(Input.check(Key.S) != s) {
 					s = !s;
 					addMyCommand(new Command(isP1, Command.S, perceivedFrame+FRAME_DELAY));
+				}
+				
+				//mouse
+				if (Input.mouseDown != mouse) {
+					mouse = !mouse;
+					addMyCommand(new Command(isP1, Command.MOUSE_TOGGLE, perceivedFrame+FRAME_DELAY, Input.mouseX, Input.mouseY));
 				}
 			}
 			
