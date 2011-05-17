@@ -92,10 +92,12 @@ package entities {
 				return true;
 			
 			//off screen check, prevent shove
-			if ((isHorizontal && boulder.isOffScreenHorizontal()) || (!isHorizontal && boulder.isOffScreenVertical()))
+			if ((isHorizontal && boulder.isOffScreenHorizontal()) || (!isHorizontal && boulder.isOffScreenVertical())) {
+				boulder.shoved = false;
 				return false;
+			}
 			
-			//reset
+			//set shoved
 			boulder.shoved = true;
 			
 			//declare variables
@@ -123,7 +125,7 @@ package entities {
 				boulder.shouldMoveY += toMove;
 			
 			//reset
-			boulder.shoved = false;
+			//boulder.shoved = false;
 			
 			return true;
 		}

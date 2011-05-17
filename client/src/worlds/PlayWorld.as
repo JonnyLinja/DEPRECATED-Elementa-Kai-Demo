@@ -148,8 +148,8 @@ package worlds {
 			//declare variables
 			var length:int = m.length;
 			var c:int;
-			var mouseX:int = m.getInt(1);
-			var mouseY:int = m.getInt(2);
+			var cMouseX:int = m.getInt(1);
+			var cMouseY:int = m.getInt(2);
 			
 			//increment true max
 			lastEnemyFrame += m.getUInt(0);
@@ -167,7 +167,7 @@ package worlds {
 						insertCommand(new Command(!isP1, c, lastEnemyFrame));
 						break;
 					case Command.MOUSE_TOGGLE:
-						insertCommand(new Command(!isP1, c, lastEnemyFrame, mouseX, mouseY));
+						insertCommand(new Command(!isP1, c, lastEnemyFrame, cMouseX, cMouseY));
 						break;
 				}
 			}

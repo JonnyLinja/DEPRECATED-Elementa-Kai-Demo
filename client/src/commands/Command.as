@@ -20,8 +20,8 @@ package commands {
 		public var y:Number; //number type for speed purposes?
 		
 		//linked list
-		public var next:Command;
-		public var prev:Command;
+		public var next:Command=null;
+		public var prev:Command=null;
 		
 		/**
 		 * Constructor

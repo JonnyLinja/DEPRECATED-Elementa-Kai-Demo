@@ -46,5 +46,12 @@ package entities {
 			//image
 			sprite_map.setFrame(2, 0);
 		}
+		
+		override public function update():void {
+			super.update();
+			
+			//reset shoved
+			shoved = false;
+		}
 	}
 }
