@@ -1122,7 +1122,16 @@
 			while (oldCurrentEntity)
 			{
 				//rollback
-				if (oldCurrentEntity._world && !thisCurrentEntity._world)
+				if (!thisCurrentEntity) {
+					//add new entity, rolling back if it is recycled
+					thisCurrentEntity = new oldCurrentEntity._class;
+					if (!oldCurrentEntity._world)
+						//add unrecycled
+						thisCurrentEntity._world = this;
+					else
+						thisCurrentEntity.rollback(oldCurrentEntity);
+					add(thisCurrentEntity);
+				}else if (oldCurrentEntity._world && !thisCurrentEntity._world)
 				{
 					//unrecycle entity and rollback
 					unrecycle(thisCurrentEntity);
