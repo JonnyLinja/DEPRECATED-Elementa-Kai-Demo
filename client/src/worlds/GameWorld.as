@@ -1,12 +1,14 @@
 package worlds {
 	import commands.Command;
+	import commands.CommandProcessor;
+	import commands.EarthCommandProcessor;
+	
 	import entities.Bender;
 	import entities.AirBender;
 	import entities.EarthBender;
 	import entities.FireBender;
 	import entities.Wall;
 	import entities.WaterBender;
-	import entities.Boulder;
 	
 	import flashpunk.World;
 	
@@ -18,12 +20,16 @@ package worlds {
 	import general.Utils;
 	
 	public class GameWorld extends World {
-		private var player1:Bender;
-		private var player2:Bender;
+		internal var player1:Bender;
+		internal var player2:Bender;
+		internal var processor1:CommandProcessor;
+		internal var processor2:CommandProcessor;
 		
 		public function GameWorld() {
 			player1 = new AirBender(200, 10);
+			processor1 = new CommandProcessor(this, player1);
 			player2 = new EarthBender(150, 10);
+			processor2 = new EarthCommandProcessor(this, player2);
 			add(player1);
 			add(player2);
 			add(new Wall( -FP.width, -FP.height, FP.width * 3, FP.height)); //top
@@ -33,38 +39,11 @@ package worlds {
 			updateLists();
 		}
 		
-		public function executeCommand(command:Command):void {
-			if (command.type == Command.A) {
-				//left
-				if(command.player)
-					player1.moveLeft = !player1.moveLeft;
-				else
-					player2.moveLeft = !player2.moveLeft;
-			}else if (command.type == Command.D) {
-				//right
-				if(command.player)
-					player1.moveRight = !player1.moveRight;
-				else
-					player2.moveRight = !player2.moveRight;
-			}else if (command.type == Command.W) {
-				//up
-				if(command.player)
-					player1.moveUp = !player1.moveUp;
-				else
-					player2.moveUp = !player2.moveUp;
-			}else if (command.type == Command.S) {
-				//down
-				if(command.player)
-					player1.moveDown = !player1.moveDown;
-				else
-					player2.moveDown = !player2.moveDown;
-			}else if (command.type == Command.MOUSE_TOGGLE) {
-				//create boulder
-				//temporary, everyone can do it on both mouse down AND up
-				var boulder:Boulder = create(Boulder, true) as Boulder;
-				boulder.x = command.x - boulder.halfWidth;
-				boulder.y = command.y - boulder.halfHeight;
-			}
+		public function executeCommand(c:Command):void {
+			if (c.player)
+				processor1.add(c);
+			else
+				processor2.add(c);
 		}
 		
 		override public function update():void {
@@ -78,7 +57,8 @@ package worlds {
 		}
 		
 		override public function end():void {
-			
+			player1 = null;
+			player2 = null;
 		}
 	}
 }

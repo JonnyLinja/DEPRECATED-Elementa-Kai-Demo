@@ -50,6 +50,10 @@ package worlds {
 		private var mouse:Boolean = false;
 		private var c:Boolean = false;
 		
+		//mouse
+		private var lastMouseX:Number = 0;
+		private var lastMouseY:Number = 0;
+		
 		public function PlayWorld(isP1:Boolean) {
 			//set variables
 			this.isP1 = isP1;
@@ -404,7 +408,15 @@ package worlds {
 				if (Input.mouseDown != mouse) {
 					mouse = !mouse;
 					addMyCommand(new Command(isP1, Command.MOUSE_TOGGLE, perceivedFrame+FRAME_DELAY, Input.mouseX, Input.mouseY));
-				}
+				}/*else if (Utils.didChangeDirection(lastMouseX, lastMouseY, Input.mouseX, Input.mouseY)) {
+					Utils.log("added mouse drag");
+					addMyCommand(new Command(isP1, Command.MOUSE_DRAG, perceivedFrame+FRAME_DELAY, Input.mouseX, Input.mouseY));
+				}else
+					Utils.log(lastMouseX + ", " + lastMouseY + " vs " + Input.mouseX + ", " + Input.mouseY);
+				*/
+				//mouse change direction code does not work
+				//should probably find out a good method of doing this
+				//	minimum time, mouse toggle, change direction, severe speed increase are the 3 areas perhaps?
 			}
 			
 			//send message
@@ -412,6 +424,10 @@ package worlds {
 				Net.conn.sendMessage(m);
 				m = null;
 			}
+			
+			//store mouse
+			lastMouseX = Input.mouseX;
+			lastMouseY = Input.mouseY;
 		}
 		
 		/**
@@ -427,7 +443,7 @@ package worlds {
 		 * Destroys the command linked list and the two worlds upon finishing
 		 */
 		override public function end():void {
-			
+			Net.conn.removeMessageHandler(Net.MESSAGE_COMMANDS, null);
 		}
 		
 		public function displayCommands():String {
