@@ -48,6 +48,7 @@ package worlds {
 		private var w:Boolean = false;
 		private var s:Boolean = false;
 		private var mouse:Boolean = false;
+		private var c:Boolean = false;
 		
 		public function PlayWorld(isP1:Boolean) {
 			//set variables
@@ -332,6 +333,12 @@ package worlds {
 		 * Adds new commands to the message to be sent
 		 */
 		private function updateInputs():void {
+			if (Input.check(Key.C) != c) {
+				c = !c;
+				if (c)
+					printCommands();
+			}
+			
 			if (!shouldRender)
 				return;
 			
@@ -421,6 +428,38 @@ package worlds {
 		 */
 		override public function end():void {
 			
+		}
+		
+		public function displayCommands():String {
+			var result:String = "====================FRAMES====================\n";
+			result += "true: " + trueFrame + "\nperceived:" + perceivedFrame + "\n";
+			
+			result += "====================COMMANDS====================\n";
+			
+			//declare variables
+			var c:Command = firstCommand;
+			
+			while (c) {
+				//print
+				result += c.frame + "\t" + c.type + "\t" + c.player + "\t" + c.x + "\t" + c.y + "\n";
+				if (c == trueCommand)
+					result += "\ttrue\n";
+				if (c == perceivedCommand)
+					result += "\tperceived\n";
+				if (c.prev && (c.prev).next != c)
+					result += "\tstructure error, prev.next != self\n";
+				if (c.next && (c.next).prev != c)
+					result += "\tstructure error, next.prev != self\n";
+				
+				//increment
+				c = c.next;
+			}
+			
+			return result;
+		}
+		
+		public function printCommands():void {
+			Utils.log(displayCommands());
 		}
 	}
 }

@@ -26,6 +26,7 @@ package general {
 		public static function log(data:String):void {
 			//temporary - for logging purposes
 			ExternalInterface.call("log", data.toString());
+			//trace(data.toString());
 		}
 		
 		public static function swap(a:Object, b:Object):void {
