@@ -27,8 +27,9 @@ package worlds {
 		private var m:Message = null; //to send
 		
 		//frames
-		private const FRAME_RATE:uint = 33; //~30 fps
-		private const FRAME_DELAY:uint = 2; //how many frames to delay inputs by - has to be at least 1!
+		private static const FRAME_RATE:uint = 33; //~30 fps
+		private static const FRAME_DELAY:uint = 3; //how many frames to delay inputs by - has to be at least 1!
+		private static const FRAME_MIN_SEND:uint = 10; //tries sends mouse position
 		private var trueFrame:uint = 0; //current frame of true
 		private var perceivedFrame:uint = 0; //current frame of perceived
 		private var lastEnemyFrame:uint = 0; //last frame received by enemy
@@ -50,10 +51,6 @@ package worlds {
 		private var mouse:Boolean = false;
 		private var c:Boolean = false;
 		
-		//mouse
-		private var lastMouseX:Number = 0;
-		private var lastMouseY:Number = 0;
-		
 		public function PlayWorld(isP1:Boolean) {
 			//set variables
 			this.isP1 = isP1;
@@ -61,6 +58,8 @@ package worlds {
 			
 			//message handler
 			Net.conn.addMessageHandler(Net.MESSAGE_COMMANDS, receiveEnemyCommands);
+			
+			Utils.log("isP1 " + isP1);
 		}
 		
 		/**
@@ -159,10 +158,10 @@ package worlds {
 			//increment true max
 			lastEnemyFrame += m.getUInt(0);
 			
-			Utils.log("frame difference is " + (perceivedFrame - lastEnemyFrame));
+			//Utils.log("frame difference is " + (perceivedFrame - lastEnemyFrame));
 			
 			//loop insert new command
-			for (var pos:int=1; pos<length; pos++) {
+			for (var pos:int=3; pos<length; pos++) {
 				c = m.getInt(pos);
 				switch(c) {
 					case Command.W:
@@ -172,6 +171,7 @@ package worlds {
 						insertCommand(new Command(!isP1, c, lastEnemyFrame));
 						break;
 					case Command.MOUSE_TOGGLE:
+					case Command.BLANK:
 						insertCommand(new Command(!isP1, c, lastEnemyFrame, cMouseX, cMouseY));
 						break;
 				}
@@ -194,11 +194,12 @@ package worlds {
 		 */
 		private function updateTrueWorld():void {
 			//determine frame to loop to
-			var leastFrame:Number = Math.min(lastEnemyFrame, perceivedFrame);
+			var leastFrame:Number = Math.min(lastEnemyFrame, perceivedFrame-1);
 			
-			//should render
+			//synchronize
 			if(trueFrame <= leastFrame)
-				shouldRender = true;
+				//shouldRender = true;
+				trueWorld.synchronize(perceivedWorld);
 			else
 				return;
 			
@@ -247,11 +248,12 @@ package worlds {
 				return;
 			
 			//rollback
+			perceivedWorld.synchronize(trueWorld);
 			perceivedWorld.rollback(trueWorld);
 			perceivedCommand = trueCommand;
 			
 			//loop update perceived
-			for (var tempFrame:int = trueFrame; tempFrame < perceivedFrame; tempFrame++ ) {
+			for (var tempFrame:int = trueFrame; tempFrame < perceivedFrame-1; tempFrame++ ) {
 				//commands
 				if (firstCommand) {
 					//at least 1 command!, loop through them
@@ -419,15 +421,16 @@ package worlds {
 				//	minimum time, mouse toggle, change direction, severe speed increase are the 3 areas perhaps?
 			}
 			
+			//minimum mouse send
+			if (!m && lastMyFrame + FRAME_MIN_SEND < perceivedFrame+FRAME_DELAY) {
+				addMyCommand(new Command(isP1, Command.BLANK, perceivedFrame + FRAME_DELAY, Input.mouseX, Input.mouseY));
+			}
+			
 			//send message
 			if (m) {
 				Net.conn.sendMessage(m);
 				m = null;
 			}
-			
-			//store mouse
-			lastMouseX = Input.mouseX;
-			lastMouseY = Input.mouseY;
 		}
 		
 		/**

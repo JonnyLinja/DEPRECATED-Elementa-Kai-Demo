@@ -20,10 +20,10 @@ package worlds {
 	import general.Utils;
 	
 	public class GameWorld extends World {
-		internal var player1:Bender;
-		internal var player2:Bender;
-		internal var processor1:CommandProcessor;
-		internal var processor2:CommandProcessor;
+		private var player1:Bender;
+		private var player2:Bender;
+		private var processor1:CommandProcessor;
+		private var processor2:CommandProcessor;
 		
 		public function GameWorld() {
 			player1 = new AirBender(200, 10);
@@ -47,13 +47,20 @@ package worlds {
 		}
 		
 		override public function update():void {
-			super.update();
-			
 			updateLists();
+			super.update();
 		}
 		
-		public function executeCommandWithPoint(isP1:Boolean, command:int, x:Number, y:Number):void {
+		override public function rollback(w:World):void {
+			//super
+			super.rollback(w);
 			
+			//declare variables
+			var g:GameWorld = w as GameWorld;
+			
+			//rollback processors
+			processor1.rollback(g.processor1);
+			processor2.rollback(g.processor2);
 		}
 		
 		override public function end():void {

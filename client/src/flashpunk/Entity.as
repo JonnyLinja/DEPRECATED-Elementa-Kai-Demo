@@ -977,7 +977,6 @@ package flashpunk
 		
 		// Entity information.
 		/** @private */ internal var _created:Boolean; //to determine if should add to the master list
-		/** @private */ internal var _next:Entity; //master list
 		/** @private */ internal var _class:Class;
 		/** @private */ internal var _world:World;
 		/** @private */ internal var _group:Group;

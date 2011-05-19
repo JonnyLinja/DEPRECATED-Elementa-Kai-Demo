@@ -2,13 +2,12 @@ package commands {
 	import worlds.GameWorld;
 	import entities.Bender;
 	import entities.Boulder;
-	import general.Utils;
 	
 	public class EarthCommandProcessor extends CommandProcessor {
-		private static const createMinDistance:Number = 300;
-		private var didChangeVertical:Boolean = false;
-		private var verticalDistance1:Number = 0;
-		private var verticalDistance2:Number = 0;
+		//private static const createMinDistance:Number = 300;
+		//private var didChangeVertical:Boolean = false;
+		//private var verticalDistance1:Number = 0;
+		//private var verticalDistance2:Number = 0;
 		
 		public function EarthCommandProcessor(world:GameWorld, player:Bender) {
 			super(world, player);

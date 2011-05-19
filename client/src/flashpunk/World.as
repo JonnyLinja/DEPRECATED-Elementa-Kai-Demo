@@ -1,6 +1,5 @@
 ﻿package flashpunk
 {
-	import entities.Bender;
 	import flash.geom.Point;
 	import flash.utils.Dictionary;
 	//import flashpunk.utils.Input;
@@ -178,16 +177,7 @@
 		 */
 		public function destroyMasterList():void
 		{
-			var e:Entity = _firstEntity,
-				n:Entity = null;
-			while (e)
-			{
-				n = e._next;
-				e._next = null;
-				e._world = null;
-				e.removed();
-				e = n;
-			}
+			_list = null;
 		}
 		
 		/**
@@ -1068,6 +1058,7 @@
 					if (e._world)
 					{
 						e._world = null;
+						e._recycleNext = null;
 						_recycle[_recycle.length] = e;
 						continue;
 					}
@@ -1109,29 +1100,44 @@
 		}
 		
 		/**
+		 * Ensures master lists are the same
+		 * Adds unrecycled entities from w to this world
+		 * @param	w
+		 */
+		public function synchronize(w:World):void
+		{
+			for (var i:int = _list.length; i < w._list.length; i++)
+			{
+				//add unrecycled
+				var e:Entity = new w._list[i]._class;
+				e._world = this; //force it to be added as recycled
+				add(e);
+			}
+			
+			//update
+			updateLists();
+		}
+		
+		/**
 		 * Rolls back primitive values of current World's Entities to the old World's Entities
+		 * Assumes both worlds have already been synchronized
 		 * @param	w	World to be rolled back to
 		 */
 		public function rollback(w:World):void
 		{
 			//declare vars
-			var thisCurrentEntity:Entity = _firstEntity;
-			var oldCurrentEntity:Entity = w._firstEntity;
+			var thisCurrentEntity:Entity;
+			var oldCurrentEntity:Entity;
 			
 			//loop through all entities to be rolled back to
-			while (oldCurrentEntity)
+			for (var i:int = 0; i < _list.length; i++)
 			{
+				//grab entity
+				thisCurrentEntity = _list[i];
+				oldCurrentEntity = w._list[i];
+				
 				//rollback
-				if (!thisCurrentEntity) {
-					//add new entity, rolling back if it is recycled
-					thisCurrentEntity = new oldCurrentEntity._class;
-					if (!oldCurrentEntity._world)
-						//add unrecycled
-						thisCurrentEntity._world = this;
-					else
-						thisCurrentEntity.rollback(oldCurrentEntity);
-					add(thisCurrentEntity);
-				}else if (oldCurrentEntity._world && !thisCurrentEntity._world)
+				if (oldCurrentEntity._world && !thisCurrentEntity._world)
 				{
 					//unrecycle entity and rollback
 					unrecycle(thisCurrentEntity);
@@ -1140,29 +1146,11 @@
 				{
 					//recycle entity
 					recycle(thisCurrentEntity);
-				}else
+				}else if(oldCurrentEntity._world && thisCurrentEntity._world)
 				{
 					//just rollback
 					thisCurrentEntity.rollback(oldCurrentEntity);
 				}
-				
-				//increment
-				thisCurrentEntity = thisCurrentEntity._next;
-				oldCurrentEntity = oldCurrentEntity._next;
-			}
-			
-			//add new recycled entities to old world
-			while (thisCurrentEntity)
-			{
-				//add unrecycled
-				//hopefully works, needs testing
-				var e:Entity = new thisCurrentEntity._class;
-				e._world = w; //force it to be added as recycled
-				w.add(e);
-				e = null;
-				
-				//increment
-				thisCurrentEntity = thisCurrentEntity._next;
 			}
 			
 			//update lists
@@ -1174,17 +1162,7 @@
 		private function addToMasterList(e:Entity):void
 		{
 			// add to master list
-			if (_lastEntity) {
-				//not first entry into list
-				_lastEntity._next = e;
-				e._next = null;
-				_lastEntity = e;
-			}else {
-				//first entry
-				e._next = null;
-				_firstEntity = e;
-				_lastEntity = e;
-			}
+			_list.push(e);
 		}
 		
 		/** @private Adds Entity to the update list. */
@@ -1367,8 +1345,7 @@
 		/** @private */	private var _recycle:Vector.<Entity> = new Vector.<Entity>;
 		
 		// Rollback information.
-		/** @private */ private var _firstEntity:Entity;
-		/** @private */ private var _lastEntity:Entity;
+		/** @private */ internal var _list:Vector.<Entity> = new Vector.<Entity>();
 		
 		// Update information.
 		/** @private */	private var _updateFirst:Entity;

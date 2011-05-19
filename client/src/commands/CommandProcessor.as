@@ -4,7 +4,6 @@ package commands {
 	
 	public class CommandProcessor {
 		protected var world:GameWorld = null;
-		protected var list:Vector.<Command> = new Vector.<Command>;
 		protected var player:Bender = null;
 		protected var mouseDown:Boolean = false;
 		protected var justToggled:Boolean;
@@ -31,6 +30,10 @@ package commands {
 				justToggled = true;
 				mouseDown = !mouseDown;
 			}
+		}
+		
+		public function rollback(p:CommandProcessor):void {
+			mouseDown = p.mouseDown;
 		}
 	}
 }

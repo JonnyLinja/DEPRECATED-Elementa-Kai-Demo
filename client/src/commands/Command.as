@@ -4,13 +4,13 @@ package commands {
 		//more concerned with cpu than memory - not sure which is better
 		
 		//constants
-		public static const UPDATE:int = 0;
+		public static const BLANK:int = 0;
 		public static const W:int = 1;
 		public static const A:int = 2;
 		public static const S:int = 3;
 		public static const D:int = 4;
-		public static const MOUSE_DRAG:int = 5;
-		public static const MOUSE_TOGGLE:int = 6;
+		//public static const MOUSE_DRAG:int = 5;
+		public static const MOUSE_TOGGLE:int = 5;
 		
 		//vars
 		public var player:Boolean;

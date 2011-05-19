@@ -53,16 +53,6 @@ package general {
 			return false;
 		}
 		
-		//DOES NOT WORK
-		//KILL THIS WITH FIRE
-		public static function didChangeDirection(x1:Number, y1:Number, x2:Number, y2:Number):Boolean {
-			if (didChangeSign(x1, x2))
-				return true;
-			if (didChangeSign(y1, y2))
-				return true;
-			return false;
-		}
-		
 		public function Utils() {
 			
 		}
