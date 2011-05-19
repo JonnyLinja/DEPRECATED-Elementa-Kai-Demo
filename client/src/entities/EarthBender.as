@@ -24,14 +24,10 @@ package entities {
 		//sprite
 		[Embed(source = '../../images/earthbender.PNG')]
 		private static const image:Class; 
-		private var sprite_map:Spritemap = new Spritemap(image, W, H);
 		
 		public function EarthBender(x:Number = 0, y:Number = 0) {
 			//super
-			super(x, y);
-			
-			//sprite
-			graphic = sprite_map;
+			super(x, y, image, W, H);
 			
 			//size
 			width = W;
@@ -45,10 +41,6 @@ package entities {
 			
 			//overlap
 			preventBoulderOverlap = false;
-			
-			//temp animation test
-			sprite_map.add("walkdown", [0, 1, 2], 20, true);
-			sprite_map.play("walkdown");
 		}
 		
 		override protected function resetShouldVariables():void {

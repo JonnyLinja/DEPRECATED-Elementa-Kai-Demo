@@ -20,8 +20,15 @@ package worlds {
 	import general.Utils;
 	
 	public class GameWorld extends World {
+		//frame constants
+		public static const FRAME_RATE:uint = 33; //~30 fps
+		public static const FRAME_ELAPSED:Number = FRAME_RATE / 1000;
+		
+		//players
 		private var player1:Bender;
 		private var player2:Bender;
+		
+		//commands
 		private var processor1:CommandProcessor;
 		private var processor2:CommandProcessor;
 		

@@ -24,8 +24,7 @@ package entities {
 		
 		//sprite
 		[Embed(source = '../../images/airbender.PNG')]
-		private static const image:Class; 
-		private var sprite_map:Spritemap = new Spritemap(image, W, H);
+		private static const image:Class;
 		
 		//bounce
 		private var shouldBounceVertical:Boolean;
@@ -33,10 +32,7 @@ package entities {
 		
 		public function AirBender(x:Number = 0, y:Number = 0) {
 			//super
-			super(x, y);
-			
-			//sprite
-			graphic = sprite_map;
+			super(x, y, image, W, H);
 			
 			//size
 			width = W;
@@ -63,10 +59,6 @@ package entities {
 			rightForce.deceleration = -DECEL;
 			upForce.deceleration = DECEL;
 			downForce.deceleration = -DECEL;
-			
-			//temp animation test
-			sprite_map.add("walkdown", [0, 1, 2], 20, true);
-			sprite_map.play("walkdown");
 		}
 		
 		override protected function resetShouldVariables():void {

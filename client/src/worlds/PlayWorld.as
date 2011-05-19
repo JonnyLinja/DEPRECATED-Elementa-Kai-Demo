@@ -1,4 +1,6 @@
 package worlds {
+	import flash.geom.Point;
+	
 	import playerio.Message;
 	
 	import flashpunk.utils.Input;
@@ -11,6 +13,7 @@ package worlds {
 	import commands.Command;
 	import general.Utils;
 	import worlds.GameWorld;
+	import gestures.DragGesture;
 	
 	public class PlayWorld extends World {
 		//worlds
@@ -27,7 +30,6 @@ package worlds {
 		private var m:Message = null; //to send
 		
 		//frames
-		private static const FRAME_RATE:uint = 33; //~30 fps
 		private static const FRAME_DELAY:uint = 3; //how many frames to delay inputs by - has to be at least 1!
 		private static const FRAME_MIN_SEND:uint = 10; //tries sends mouse position
 		private var trueFrame:uint = 0; //current frame of true
@@ -50,6 +52,9 @@ package worlds {
 		private var s:Boolean = false;
 		private var mouse:Boolean = false;
 		private var c:Boolean = false;
+		
+		//gestures
+		private var dragGesture:DragGesture = new DragGesture;
 		
 		public function PlayWorld(isP1:Boolean) {
 			//set variables
@@ -187,7 +192,7 @@ package worlds {
 		 * Updates true, perceived, and inputs
 		 */
 		override public function update():void {
-			FP.elapsed = FRAME_RATE / 1000;
+			FP.elapsed = GameWorld.FRAME_RATE / 1000;
 			updateTrueWorld();
 			updatePerceivedWorld();
 			updateInputs();
@@ -335,7 +340,7 @@ package worlds {
 				perceivedFrame++;
 				
 				//increment next frame
-				nextFrameTime += FRAME_RATE;
+				nextFrameTime += GameWorld.FRAME_RATE;
 			}while (FP.time >= nextFrameTime);
 		}
 		
@@ -344,44 +349,49 @@ package worlds {
 		 * Adds new commands to the message to be sent
 		 */
 		private function updateInputs():void {
+			//temp display shit
 			if (Input.check(Key.C) != c) {
 				c = !c;
 				if (c)
 					printCommands();
 			}
 			
+			//determine is should run
 			if (!shouldRender)
 				return;
+			
+			//declare variables
+			var toSendFrame:uint = perceivedFrame + FRAME_DELAY;
 			
 			if (lostWindowFocus) {
 				//left
 				if (a) {
 					a = false;
-					addMyCommand(new Command(isP1, Command.A, perceivedFrame+FRAME_DELAY));
+					addMyCommand(new Command(isP1, Command.A, toSendFrame));
 				}
 				
 				//right
 				if (d) {
 					d = false;
-					addMyCommand(new Command(isP1, Command.D, perceivedFrame+FRAME_DELAY));
+					addMyCommand(new Command(isP1, Command.D, toSendFrame));
 				}
 				
 				//up
 				if (w) {
 					w = false;
-					addMyCommand(new Command(isP1, Command.W, perceivedFrame+FRAME_DELAY));
+					addMyCommand(new Command(isP1, Command.W, toSendFrame));
 				}
 				
 				//down
 				if (s) {
 					s = false;
-					addMyCommand(new Command(isP1, Command.S, perceivedFrame+FRAME_DELAY));
+					addMyCommand(new Command(isP1, Command.S, toSendFrame));
 				}
 				
 				//mouse
 				if (mouse) {
 					mouse = false;
-					addMyCommand(new Command(isP1, Command.MOUSE_TOGGLE, perceivedFrame+FRAME_DELAY, Input.mouseX, Input.mouseY));
+					addMyCommand(new Command(isP1, Command.MOUSE_TOGGLE, toSendFrame, Input.mouseX, Input.mouseY));
 				}
 				
 				//reset
@@ -390,45 +400,38 @@ package worlds {
 				//left
 				if(Input.check(Key.A) != a) {
 					a = !a;
-					addMyCommand(new Command(isP1, Command.A, perceivedFrame+FRAME_DELAY));
+					addMyCommand(new Command(isP1, Command.A, toSendFrame));
 				}
 				
 				//right
 				if(Input.check(Key.D) != d) {
 					d = !d;
-					addMyCommand(new Command(isP1, Command.D, perceivedFrame+FRAME_DELAY));
+					addMyCommand(new Command(isP1, Command.D, toSendFrame));
 				}
 				
 				//up
 				if(Input.check(Key.W) != w) {
 					w = !w;
-					addMyCommand(new Command(isP1, Command.W, perceivedFrame+FRAME_DELAY));
+					addMyCommand(new Command(isP1, Command.W, toSendFrame));
 				}
 				
 				//down
 				if(Input.check(Key.S) != s) {
 					s = !s;
-					addMyCommand(new Command(isP1, Command.S, perceivedFrame+FRAME_DELAY));
+					addMyCommand(new Command(isP1, Command.S, toSendFrame));
 				}
 				
 				//mouse
 				if (Input.mouseDown != mouse) {
 					mouse = !mouse;
-					addMyCommand(new Command(isP1, Command.MOUSE_TOGGLE, perceivedFrame+FRAME_DELAY, Input.mouseX, Input.mouseY));
-				}/*else if (Utils.didChangeDirection(lastMouseX, lastMouseY, Input.mouseX, Input.mouseY)) {
-					Utils.log("added mouse drag");
-					addMyCommand(new Command(isP1, Command.MOUSE_DRAG, perceivedFrame+FRAME_DELAY, Input.mouseX, Input.mouseY));
-				}else
-					Utils.log(lastMouseX + ", " + lastMouseY + " vs " + Input.mouseX + ", " + Input.mouseY);
-				*/
-				//mouse change direction code does not work
-				//should probably find out a good method of doing this
-				//	minimum time, mouse toggle, change direction, severe speed increase are the 3 areas perhaps?
+					addMyCommand(new Command(isP1, Command.MOUSE_TOGGLE, toSendFrame, Input.mouseX, Input.mouseY));
+				}
 			}
 			
-			//minimum mouse send
-			if (!m && lastMyFrame + FRAME_MIN_SEND < perceivedFrame+FRAME_DELAY) {
-				addMyCommand(new Command(isP1, Command.BLANK, perceivedFrame + FRAME_DELAY, Input.mouseX, Input.mouseY));
+			//blank commands
+			if (!m) {
+				if (lastMyFrame + FRAME_MIN_SEND < toSendFrame || dragGesture.check(new Point(Input.mouseX, Input.mouseY)))
+					addMyCommand(new Command(isP1, Command.BLANK, toSendFrame, Input.mouseX, Input.mouseY));
 			}
 			
 			//send message

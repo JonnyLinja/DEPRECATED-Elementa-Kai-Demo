@@ -1,11 +1,7 @@
 package networking {
 	import playerio.Client;
 	import playerio.Connection;
-
-	/**
-	 * ...
-	 * @author 
-	 */
+	
 	public class Net {
 		//connection variables
 		public static var conn:Connection;

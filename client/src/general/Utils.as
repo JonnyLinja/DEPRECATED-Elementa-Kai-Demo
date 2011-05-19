@@ -6,7 +6,7 @@ package general {
 	import entities.WaterBender;
 	
 	import flash.external.ExternalInterface;
-	import flash.utils.ByteArray;
+	import flash.geom.Point
 
 	public class Utils {
 		/**
@@ -51,6 +51,50 @@ package general {
 			if (n1 > 0 && n2 < 0)
 				return true;
 			return false;
+		}
+		
+		public static function direction(p1:Point, p2:Point):int {
+			//declare variables
+			var dx:Number = p1.x - p2.x;
+			var dy:Number = p1.y - p2.y;
+			var rotation:int = rotation(dx, dy);
+			
+			//Utils.log("rotation is " + rotation);
+			
+			//return direction
+			if(rotation >= 337 || rotation <= 23)
+				return 4; //left
+			if (rotation < 67)
+				return 7; //top left
+			if (rotation <= 113)
+				return 8; //top
+			if (rotation < 157)
+				return 9; //top right
+			if (rotation <= 203)
+				return 6; //right
+			if (rotation < 247)
+				return 3; //bottom right
+			if (rotation <= 293)
+				return 2; //bottom
+			if (rotation < 337)
+				return 1; //bottom left
+			
+			//default
+			return 0;
+		}
+		
+		/**
+		 * Returns the rotation angle in degrees
+		 * Note that it is still using Flash points, so left/right and up/down are mixed up
+		 * @param	dx
+		 * @param	dy
+		 * @return
+		 */
+		public static function rotation(dx:Number, dy:Number):Number {
+			var result:Number = Math.atan2(dy, dx) * 180 / Math.PI;
+			if (result < 0)
+				result += 360
+			return result;
 		}
 		
 		public function Utils() {

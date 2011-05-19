@@ -5,15 +5,29 @@ package entities {
 	
 	import flashpunk.Entity;
 	import flashpunk.FP;
+	import flashpunk.graphics.Spritemap;
 	
 	import general.Utils;
+	import worlds.GameWorld;
 	
 	public class Bender extends MovableEntity {
+		//animation constants
+		public static const WALK_DOWN:String = "walkdown";
+		public static const WALK_UP:String = "walkup";
+		public static const WALK_LEFT:String = "walkleft";
+		public static const WALK_RIGHT:String = "walkright";
+		
+		//spritemap
+		protected var sprite_map:Spritemap;
+		
 		//commands
 		public var moveLeft:Boolean;
 		public var moveRight:Boolean;
 		public var moveUp:Boolean;
 		public var moveDown:Boolean;
+		
+		//mouse
+		public var mouse:Point = new Point();
 		
 		//forces
 		public var leftForce:ForceComponent = new ForceComponent();
@@ -30,9 +44,23 @@ package entities {
 		//overlap
 		protected var preventBoulderOverlap:Boolean = true;
 		
-		public function Bender(x:Number = 0, y:Number = 0) {
+		public function Bender(x:Number = 0, y:Number = 0, image:Class = null, iWidth:uint= 0, iHeight:uint = 0) {
 			//super
 			super(x, y);
+			
+			//image
+			if (image) {
+				//sprite
+				sprite_map = new Spritemap(image, iWidth, iHeight);
+				graphic = sprite_map;
+				
+				//animations
+				sprite_map.add(WALK_DOWN, [0, 1, 2], 33, true);
+				sprite_map.add(WALK_LEFT, [3, 4, 5], 33, true);
+				sprite_map.add(WALK_RIGHT, [6, 7, 8], 33, true);
+				sprite_map.add(WALK_UP, [9, 10, 11], 33, true);
+				sprite_map.play(WALK_DOWN);
+			}
 		}
 			
 		override public function preUpdate():void {
@@ -87,6 +115,7 @@ package entities {
 		override public function update():void {
 			super.update();
 			updateMovement();
+			updateDirection();
 		}
 		
 		override protected function resolveShouldVariables():void {
@@ -150,6 +179,29 @@ package entities {
 			y += moveForce.y.velocity;
 		}
 		
+		protected function updateDirection():void {
+			switch(Utils.direction(new Point(centerX, centerY), mouse)) {
+				case 7:
+				case 8:
+				case 9:
+					sprite_map.play(WALK_UP);
+					break;
+				case 4:
+					sprite_map.play(WALK_LEFT);
+					break;
+				case 1:
+				case 2:
+				case 3:
+					sprite_map.play(WALK_DOWN);
+					break;
+				case 6:
+					sprite_map.play(WALK_RIGHT);
+					break;
+				default:
+					break;
+			}
+		}
+		
 		override public function rollback(oldEntity:Entity):void {
 			super.rollback(oldEntity);
 			
@@ -167,6 +219,12 @@ package entities {
 			rightForce.rollback(temp.rightForce);
 			upForce.rollback(temp.upForce);
 			downForce.rollback(temp.downForce);
+			
+			//animation frame
+			
+			//mouse
+			mouse.x = temp.mouse.x;
+			mouse.y = temp.mouse.y;
 		}
 	}
 }
