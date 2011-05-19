@@ -177,7 +177,18 @@
 		 */
 		public function destroyMasterList():void
 		{
-			_list = null;
+			//declare variables
+			var e:Entity = _firstEntity;
+			var n:Entity = null;
+			
+			//loop destroy
+			while (e) {
+				n = e._next;
+				e._next = null;
+				e._world = null;
+				e.removed();
+				e = n;
+			}
 		}
 		
 		/**
@@ -1100,22 +1111,44 @@
 		}
 		
 		/**
+		 * Initializes the sync point
+		 * Called after the preloaded Entities have been added
+		 */
+		public function beginSync():void {
+			_syncPoint = _lastEntity;
+		}
+		
+		/**
 		 * Ensures master lists are the same
 		 * Adds unrecycled entities from w to this world
 		 * @param	w
 		 */
 		public function synchronize(w:World):void
 		{
-			for (var i:int = _list.length; i < w._list.length; i++)
-			{
+			//default sync point
+			if (!w._syncPoint)
+				return;
+			
+			//increment to next
+			w._syncPoint = w._syncPoint._next;
+			
+			//loop
+			while (w._syncPoint) {
 				//add unrecycled
-				var e:Entity = new w._list[i]._class;
+				var e:Entity = new w._syncPoint._class;
 				e._world = this; //force it to be added as recycled
 				add(e);
+				
+				//increment
+				w._syncPoint = w._syncPoint._next;
 			}
 			
 			//update
 			updateLists();
+			
+			//set sync points
+			_syncPoint = _lastEntity;
+			w._syncPoint = w._lastEntity;
 		}
 		
 		/**
@@ -1126,16 +1159,12 @@
 		public function rollback(w:World):void
 		{
 			//declare vars
-			var thisCurrentEntity:Entity;
-			var oldCurrentEntity:Entity;
+			var thisCurrentEntity:Entity = _firstEntity;
+			var oldCurrentEntity:Entity = w._firstEntity;
 			
 			//loop through all entities to be rolled back to
-			for (var i:int = 0; i < _list.length; i++)
+			while(oldCurrentEntity)
 			{
-				//grab entity
-				thisCurrentEntity = _list[i];
-				oldCurrentEntity = w._list[i];
-				
 				//rollback
 				if (oldCurrentEntity._world && !thisCurrentEntity._world)
 				{
@@ -1151,6 +1180,10 @@
 					//just rollback
 					thisCurrentEntity.rollback(oldCurrentEntity);
 				}
+				
+				//increment
+				thisCurrentEntity = thisCurrentEntity._next;
+				oldCurrentEntity = oldCurrentEntity._next;
 			}
 			
 			//update lists
@@ -1162,7 +1195,18 @@
 		private function addToMasterList(e:Entity):void
 		{
 			// add to master list
-			_list.push(e);
+			if (_lastEntity) {
+				//not first entry into list
+				_lastEntity._next = e;
+				_lastEntity = e;
+			}else {
+				//first entry
+				_firstEntity = e;
+				_lastEntity = e;
+			}
+			
+			//cleanup
+			e._next = null;
 		}
 		
 		/** @private Adds Entity to the update list. */
@@ -1345,11 +1389,13 @@
 		/** @private */	private var _recycle:Vector.<Entity> = new Vector.<Entity>;
 		
 		// Rollback information.
-		/** @private */ internal var _list:Vector.<Entity> = new Vector.<Entity>();
+		 /** @private */ private var _firstEntity:Entity;
+		 /** @private */ private var _lastEntity:Entity;
+		 /** @private */ private var _syncPoint:Entity;
 		
 		// Update information.
 		/** @private */	private var _updateFirst:Entity;
-		/** @private */	private var _count:uint;
+		/** @private */ private var _count:int;
 		
 		// Render information.
 		/** @private */	private var _renderFirst:Array = [];

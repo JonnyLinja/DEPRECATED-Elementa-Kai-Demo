@@ -59,6 +59,11 @@ package worlds {
 			//message handler
 			Net.conn.addMessageHandler(Net.MESSAGE_COMMANDS, receiveEnemyCommands);
 			
+			//sync
+			trueWorld.beginSync();
+			perceivedWorld.beginSync();
+			
+			//log
 			Utils.log("isP1 " + isP1);
 		}
 		
