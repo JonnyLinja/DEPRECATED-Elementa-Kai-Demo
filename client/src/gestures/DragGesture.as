@@ -8,7 +8,7 @@ package gestures {
 		public function DragGesture() {
 		}
 		
-		public function check(p:Point, mouseToggle:Boolean = false):Boolean {
+		public function check(p:Point, mouseDown:Boolean = false):Boolean {
 			//first time
 			if (!startPoint) {
 				startPoint = p;
@@ -17,12 +17,15 @@ package gestures {
 			
 			//met minimum distance
 			if (Point.distance(startPoint, p) >= MIN) {
-				startPoint = p;
 				return true;
 			}
 			
 			//default
 			return false;
+		}
+		
+		public function reset():void {
+			startPoint = null;
 		}
 	}
 }

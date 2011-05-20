@@ -45,6 +45,12 @@ package general {
 			return -n;
 		}
 		
+		public static function distance(x1:Number, y1:Number, x2:Number, y2:Number):Number {
+			var dx:Number = x2 - x1;
+			var dy:Number = y2 - y1;
+			return Math.sqrt((dx * dx) + (dy * dy));
+		}
+		
 		public static function didChangeSign(n1:Number, n2:Number):Boolean {
 			if (n1 < 0 && n2 > 0)
 				return true;

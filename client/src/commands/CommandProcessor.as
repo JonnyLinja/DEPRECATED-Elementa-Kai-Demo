@@ -15,10 +15,7 @@ package commands {
 		}
 		
 		public function add(c:Command):void {
-			//reset
-			justToggled = false;
-			
-			//movement
+			//movement commands
 			if (c.type == Command.A)
 				player.moveLeft = !player.moveLeft;
 			else if (c.type == Command.D)
@@ -27,15 +24,18 @@ package commands {
 				player.moveUp = !player.moveUp;
 			else if (c.type == Command.S)
 				player.moveDown = !player.moveDown;
-			else {
-				//mouse
-				if (c.type == Command.MOUSE_TOGGLE) {
-					justToggled = true;
-					mouseDown = !mouseDown;
-				}
-				player.mouse.x = c.x;
-				player.mouse.y = c.y;
-			}
+			else
+				handleMouseCommand(c);
+		}
+		
+		protected function handleMouseCommand(c:Command):void {
+			if (c.type == Command.MOUSE_TOGGLE) {
+				justToggled = true;
+				mouseDown = !mouseDown;
+			}else
+				justToggled = false;
+			player.mouse.x = c.x;
+			player.mouse.y = c.y;
 		}
 		
 		public function rollback(p:CommandProcessor):void {

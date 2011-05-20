@@ -436,6 +436,8 @@ package worlds {
 			
 			//send message
 			if (m) {
+				//dragGesture.reset(); //only need to check distance if nothign else has been sent for a while
+				
 				Net.conn.sendMessage(m);
 				m = null;
 			}
