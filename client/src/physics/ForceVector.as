@@ -1,7 +1,9 @@
 package physics {
-	public class ForceVector {
-		import general.Utils;
-		
+	import flashpunk.Rollbackable;
+	
+	import general.Utils;
+	
+	public class ForceVector implements Rollbackable {
 		public var max:Number; //max distance
 		public var x:ForceComponent = new ForceComponent();
 		public var y:ForceComponent = new ForceComponent();
@@ -57,10 +59,13 @@ package physics {
 			y.velocity *= ratio;
 		}
 		
-		public function rollback(oldForceVector:ForceVector):void {
+		public function rollback(orig:Rollbackable):void {
+			//declare variables
+			var f:ForceVector = orig as ForceVector;
+			
 			//rollback components
-			x.rollback(oldForceVector.x);
-			y.rollback(oldForceVector.y);
+			x.rollback(f.x);
+			y.rollback(f.y);
 		}
 	}
 }

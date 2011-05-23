@@ -13,7 +13,7 @@ package flashpunk
 	/**
 	 * Main game Entity class updated by World.
 	 */
-	public class Entity extends Tweener
+	public class Entity extends Tweener implements Rollbackable
 	{
 		/**
 		 * Collision did not occur
@@ -960,10 +960,13 @@ package flashpunk
 		 * Rolls back primitive values of current Entity to oldEntity
 		 * @param	oldEntity	entity to be rolled back to
 		 */
-		public function rollback(oldEntity:Entity):void {
+		public function rollback(orig:Rollbackable):void {
+			//declare variables
+			var e:Entity = orig as Entity;
+			
 			//position
-			x = oldEntity.x;
-			y = oldEntity.y;
+			x = e.x;
+			y = e.y;
 		}
 		
 		/**

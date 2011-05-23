@@ -2,6 +2,7 @@ package worlds {
 	import commands.Command;
 	import commands.CommandProcessor;
 	import commands.EarthCommandProcessor;
+	import flashpunk.Rollbackable;
 	
 	import entities.Bender;
 	import entities.AirBender;
@@ -58,12 +59,12 @@ package worlds {
 			super.update();
 		}
 		
-		override public function rollback(w:World):void {
+		override public function rollback(orig:Rollbackable):void {
 			//super
-			super.rollback(w);
+			super.rollback(orig);
 			
 			//declare variables
-			var g:GameWorld = w as GameWorld;
+			var g:GameWorld = orig as GameWorld;
 			
 			//rollback processors
 			processor1.rollback(g.processor1);

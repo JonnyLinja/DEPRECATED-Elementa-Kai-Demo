@@ -1,9 +1,10 @@
 package commands {
+	import flashpunk.Rollbackable;
+	
 	import entities.Bender;
-	import flash.geom.Point;
 	import worlds.GameWorld;
 	
-	public class CommandProcessor {
+	public class CommandProcessor implements Rollbackable {
 		protected var world:GameWorld = null;
 		protected var player:Bender = null;
 		protected var mouseDown:Boolean = false;
@@ -29,16 +30,21 @@ package commands {
 		}
 		
 		protected function handleMouseCommand(c:Command):void {
+			/*
 			if (c.type == Command.MOUSE_TOGGLE) {
 				justToggled = true;
 				mouseDown = !mouseDown;
 			}else
 				justToggled = false;
-			player.mouse.x = c.x;
-			player.mouse.y = c.y;
+			*/
+			player.mouseX = c.x;
+			player.mouseY = c.y;
 		}
 		
-		public function rollback(p:CommandProcessor):void {
+		public function rollback(orig:Rollbackable):void {
+			//cast
+			var p:CommandProcessor = orig as CommandProcessor;
+			
 			mouseDown = p.mouseDown;
 		}
 	}

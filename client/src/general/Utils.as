@@ -59,10 +59,10 @@ package general {
 			return false;
 		}
 		
-		public static function direction(p1:Point, p2:Point):int {
+		public static function direction(x1:Number, y1:Number, x2:Number, y2:Number):int {
 			//declare variables
-			var dx:Number = p1.x - p2.x;
-			var dy:Number = p1.y - p2.y;
+			var dx:Number = x1 - x2;
+			var dy:Number = y1 - y2;
 			var rotation:int = rotation(dx, dy);
 			
 			//Utils.log("rotation is " + rotation);

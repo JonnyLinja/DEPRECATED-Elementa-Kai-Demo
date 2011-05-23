@@ -40,6 +40,9 @@ package worlds {
 		//time
 		private var nextFrameTime:uint = 0; //for perceived
 		
+		//game loop
+		private var perceivedUpdateCount:int; //number of times perceived was updates during this frame
+		
 		//boolean checks
 		private var isP1:Boolean;
 		private var shouldRender:Boolean = true;
@@ -180,7 +183,6 @@ package worlds {
 					case Command.D:
 						insertCommand(new Command(!isP1, c, lastEnemyFrame));
 						break;
-					case Command.MOUSE_TOGGLE:
 					case Command.BLANK:
 						insertCommand(new Command(!isP1, c, lastEnemyFrame, cMouseX, cMouseY));
 						break;
@@ -192,7 +194,7 @@ package worlds {
 		 * Updates true, perceived, and inputs
 		 */
 		override public function update():void {
-			FP.elapsed = GameWorld.FRAME_RATE / 1000;
+			FP.elapsed = GameWorld.FRAME_ELAPSED;
 			updateTrueWorld();
 			updatePerceivedWorld();
 			updateInputs();
@@ -304,6 +306,9 @@ package worlds {
 			else
 				return;
 			
+			//reset count
+			perceivedUpdateCount = 0;
+			
 			//declare variables
 			var commandToCheck:Command;
 			
@@ -339,6 +344,9 @@ package worlds {
 				//increment perceived frame
 				perceivedFrame++;
 				
+				//increment count
+				perceivedUpdateCount++;
+				
 				//increment next frame
 				nextFrameTime += GameWorld.FRAME_RATE;
 			}while (FP.time >= nextFrameTime);
@@ -359,6 +367,9 @@ package worlds {
 			//determine is should run
 			if (!shouldRender)
 				return;
+			
+			//update gestures
+			dragGesture.update(Input.mouseX, Input.mouseY, Input.mouseDown, perceivedUpdateCount);
 			
 			//declare variables
 			var toSendFrame:uint = perceivedFrame + FRAME_DELAY;
@@ -387,12 +398,13 @@ package worlds {
 					s = false;
 					addMyCommand(new Command(isP1, Command.S, toSendFrame));
 				}
-				
+				/*
 				//mouse
 				if (mouse) {
 					mouse = false;
 					addMyCommand(new Command(isP1, Command.MOUSE_TOGGLE, toSendFrame, Input.mouseX, Input.mouseY));
 				}
+				*/
 				
 				//reset
 				lostWindowFocus = false;
@@ -421,22 +433,24 @@ package worlds {
 					addMyCommand(new Command(isP1, Command.S, toSendFrame));
 				}
 				
+				/*
 				//mouse
 				if (Input.mouseDown != mouse) {
 					mouse = !mouse;
 					addMyCommand(new Command(isP1, Command.MOUSE_TOGGLE, toSendFrame, Input.mouseX, Input.mouseY));
 				}
+				*/
 			}
 			
 			//blank commands
 			if (!m) {
-				if (lastMyFrame + FRAME_MIN_SEND < toSendFrame || dragGesture.check(new Point(Input.mouseX, Input.mouseY)))
+				if (lastMyFrame + FRAME_MIN_SEND < toSendFrame || dragGesture.check())
 					addMyCommand(new Command(isP1, Command.BLANK, toSendFrame, Input.mouseX, Input.mouseY));
 			}
 			
 			//send message
 			if (m) {
-				//dragGesture.reset(); //only need to check distance if nothign else has been sent for a while
+				dragGesture.reset(); //only need to check distance if nothign else has been sent for a while
 				
 				Net.conn.sendMessage(m);
 				m = null;

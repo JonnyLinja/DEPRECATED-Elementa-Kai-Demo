@@ -10,7 +10,7 @@ package commands {
 		public static const S:int = 3;
 		public static const D:int = 4;
 		//public static const MOUSE_DRAG:int = 5;
-		public static const MOUSE_TOGGLE:int = 5;
+		//public static const MOUSE_TOGGLE:int = 5;
 		
 		//vars
 		public var player:Boolean;

@@ -9,7 +9,7 @@
 	 * Updated by Engine, main game container that holds all currently active Entities.
 	 * Useful for organization, eg. "Menu", "Level1", etc.
 	 */
-	public class World extends Tweener
+	public class World extends Tweener implements Rollbackable
 	{
 		/**
 		 * If the render() loop is performed.
@@ -1156,9 +1156,10 @@
 		 * Assumes both worlds have already been synchronized
 		 * @param	w	World to be rolled back to
 		 */
-		public function rollback(w:World):void
+		public function rollback(orig:Rollbackable):void
 		{
 			//declare vars
+			var w:World = orig as World;
 			var thisCurrentEntity:Entity = _firstEntity;
 			var oldCurrentEntity:Entity = w._firstEntity;
 			

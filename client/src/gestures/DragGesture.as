@@ -1,31 +1,44 @@
 package gestures {
-	import flash.geom.Point;
+	import general.Utils;
 	
-	public class DragGesture implements Gesture {
-		private static const MIN:int = 100;
-		private var startPoint:Point = null;
+	public class DragGesture extends Gesture {
+		private static const MIN:int = 25;
+		private var startX:Number = 0;
+		private var startY:Number = 0;
+		private var currentX:Number = 0;
+		private var currentY:Number = 0;
+		private var started:Boolean = false;
 		
 		public function DragGesture() {
 		}
 		
-		public function check(p:Point, mouseDown:Boolean = false):Boolean {
+		override public function update(x:Number, y:Number, mouseDown:Boolean, ratio:int = 1):void {
 			//first time
-			if (!startPoint) {
-				startPoint = p;
-				return false;
+			if (!started) {
+				startX = x;
+				startY = y;
+				started = true;
 			}
 			
-			//met minimum distance
-			if (Point.distance(startPoint, p) >= MIN) {
-				return true;
-			}
-			
-			//default
-			return false;
+			currentX = x;
+			currentY = y;
 		}
 		
-		public function reset():void {
-			startPoint = null;
+		override public function check():int {
+			//not ready
+			if (!started)
+				return NOT_READY;
+			
+			//success
+			if (Utils.distance(startX, startY, currentX, currentY) >= MIN)
+				return SUCCESS;
+			
+			//failure
+			return FAILURE;
+		}
+		
+		override public function reset():void {
+			started = false;
 		}
 	}
 }

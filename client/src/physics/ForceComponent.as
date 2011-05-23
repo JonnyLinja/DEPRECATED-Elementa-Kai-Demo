@@ -1,5 +1,7 @@
 package physics {
-	public class ForceComponent {
+	import flashpunk.Rollbackable;
+	
+	public class ForceComponent implements Rollbackable {
 		public var maxVelocity:Number=0;
 		public var velocity:Number=0;
 		public var acceleration:Number=0;
@@ -45,12 +47,15 @@ package physics {
 			}
 		}
 		
-		public function rollback(oldForceComponent:ForceComponent):void {
+		public function rollback(orig:Rollbackable):void {
+			//declare variables
+			var f:ForceComponent = orig as ForceComponent;
+			
 			//rollback values
-			velocity = oldForceComponent.velocity;
-			acceleration = oldForceComponent.acceleration;
-			deceleration = oldForceComponent.deceleration;
-			maxVelocity = oldForceComponent.maxVelocity;
+			velocity = f.velocity;
+			acceleration = f.acceleration;
+			deceleration = f.deceleration;
+			maxVelocity = f.maxVelocity;
 		}
 	}
 }

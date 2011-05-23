@@ -1,12 +1,12 @@
 package commands {
-	import flash.geom.Point;
-	import gestures.ClickDragDragVerticalGesture;
+	import flashpunk.Rollbackable;
+	
 	import worlds.GameWorld;
+	
 	import entities.Bender;
 	import entities.Boulder;
 	
-	public class EarthCommandProcessor extends CommandProcessor {
-		private var createBoulderGesture:ClickDragDragVerticalGesture = new ClickDragDragVerticalGesture;
+	public class EarthCommandProcessor extends CommandProcessor implements Rollbackable {
 		
 		public function EarthCommandProcessor(world:GameWorld, player:Bender) {
 			super(world, player);
@@ -15,12 +15,6 @@ package commands {
 		override protected function handleMouseCommand(c:Command):void {
 			super.handleMouseCommand(c);
 			
-			//should determine if click on boulder first
-			//then should determine if it was OK or not
-			if(createBoulderGesture.check(new Point(c.x, c.y), mouseDown)) {
-				createBoulder(createBoulderGesture.startPoint.x, createBoulderGesture.startPoint.y);
-				createBoulderGesture.reset();
-			}
 		}
 		
 		protected function createBoulder(x:Number, y:Number):void {
@@ -30,14 +24,11 @@ package commands {
 			boulder.y = y - boulder.halfHeight;
 		}
 		
-		override public function rollback(p:CommandProcessor):void {
-			super.rollback(p);
+		override public function rollback(orig:Rollbackable):void {
+			super.rollback(orig);
 			
 			//cast
-			var ep:EarthCommandProcessor = p as EarthCommandProcessor;
-			
-			//rollback gestures
-			createBoulderGesture.rollback(ep.createBoulderGesture);
+			var ep:EarthCommandProcessor = orig as EarthCommandProcessor;
 		}
 	}
 }

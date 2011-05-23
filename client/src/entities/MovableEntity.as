@@ -1,5 +1,6 @@
 package entities {
 	import flash.geom.Point;
+	import flashpunk.Rollbackable;
 	
 	import flashpunk.Entity;
 	import flashpunk.FP;
@@ -74,14 +75,14 @@ package entities {
 			y += windForce.y;
 		}
 		
-		override public function rollback(oldEntity:Entity):void {
-			super.rollback(oldEntity);
+		override public function rollback(orig:Rollbackable):void {
+			super.rollback(orig);
 			
 			//declare
-			var temp:MovableEntity = oldEntity as MovableEntity;
+			var e:MovableEntity = orig as MovableEntity;
 			
 			//rollback forces
-			moveForce.rollback(temp.moveForce);
+			moveForce.rollback(e.moveForce);
 		}
 	}
 }

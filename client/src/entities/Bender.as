@@ -1,5 +1,6 @@
 package entities {
 	import flash.geom.Point;
+	import flashpunk.Rollbackable;
 	import physics.ForceVector;
 	import physics.ForceComponent;
 	
@@ -27,7 +28,8 @@ package entities {
 		public var moveDown:Boolean;
 		
 		//mouse
-		public var mouse:Point = new Point();
+		public var mouseX:Number = 0;
+		public var mouseY:Number = 0
 		
 		//forces
 		public var leftForce:ForceComponent = new ForceComponent();
@@ -180,7 +182,7 @@ package entities {
 		}
 		
 		protected function updateDirection():void {
-			switch(Utils.direction(new Point(centerX, centerY), mouse)) {
+			switch(Utils.direction(centerX, centerY, mouseX, mouseY)) {
 				case 7:
 				case 8:
 				case 9:
@@ -202,29 +204,29 @@ package entities {
 			}
 		}
 		
-		override public function rollback(oldEntity:Entity):void {
-			super.rollback(oldEntity);
+		override public function rollback(orig:Rollbackable):void {
+			super.rollback(orig);
 			
 			//declare
-			var temp:Bender = oldEntity as Bender;
+			var b:Bender = orig as Bender;
 			
 			//move booleans
-			moveLeft = temp.moveLeft;
-			moveRight = temp.moveRight;
-			moveDown = temp.moveDown;
-			moveUp = temp.moveUp;
+			moveLeft = b.moveLeft;
+			moveRight = b.moveRight;
+			moveDown = b.moveDown;
+			moveUp = b.moveUp;
 			
 			//movement forces
-			leftForce.rollback(temp.leftForce);
-			rightForce.rollback(temp.rightForce);
-			upForce.rollback(temp.upForce);
-			downForce.rollback(temp.downForce);
+			leftForce.rollback(b.leftForce);
+			rightForce.rollback(b.rightForce);
+			upForce.rollback(b.upForce);
+			downForce.rollback(b.downForce);
 			
 			//animation frame
 			
 			//mouse
-			mouse.x = temp.mouse.x;
-			mouse.y = temp.mouse.y;
+			mouseX = b.mouseX;
+			mouseY = b.mouseY;
 		}
 	}
 }

@@ -1,5 +1,7 @@
 package physics {
-	public class WindForce {
+	import flashpunk.Rollbackable;
+	
+	public class WindForce implements Rollbackable {
 		private static const DECEL:Number = .1;
 		protected var vector:ForceVector = new ForceVector();
 		
@@ -46,8 +48,12 @@ package physics {
 			vector.y.applyDeceleration();
 		}
 		
-		public function rollback(oldWindForce:WindForce):void {
-			vector.rollback(oldWindForce.vector);
+		public function rollback(orig:Rollbackable):void {
+			//declare variables
+			var w:WindForce = orig as WindForce;
+			
+			//rollback
+			vector.rollback(w.vector);
 		}
 	}
 }
