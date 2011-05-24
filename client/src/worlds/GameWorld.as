@@ -1,4 +1,5 @@
 package worlds {
+	import commands.AirCommandProcessor;
 	import commands.Command;
 	import commands.CommandProcessor;
 	import commands.EarthCommandProcessor;
@@ -35,7 +36,7 @@ package worlds {
 		
 		public function GameWorld() {
 			player1 = new AirBender(200, 10);
-			processor1 = new CommandProcessor(this, player1);
+			processor1 = new AirCommandProcessor(this, player1);
 			player2 = new EarthBender(150, 10);
 			processor2 = new EarthCommandProcessor(this, player2);
 			add(player1);
@@ -56,6 +57,8 @@ package worlds {
 		
 		override public function update():void {
 			updateLists();
+			processor1.update();
+			processor2.update();
 			super.update();
 		}
 		

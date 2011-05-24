@@ -2,12 +2,12 @@ package gestures {
 	import general.Utils;
 	
 	public class DragGesture extends Gesture {
-		private static const MIN:int = 25;
-		private var startX:Number = 0;
-		private var startY:Number = 0;
-		private var currentX:Number = 0;
-		private var currentY:Number = 0;
-		private var started:Boolean = false;
+		//constants
+		private static const MIN_DISTANCE:int = 25;
+		
+		//variables
+		protected var currentX:Number = 0;
+		protected var currentY:Number = 0;
 		
 		public function DragGesture() {
 		}
@@ -30,15 +30,11 @@ package gestures {
 				return NOT_READY;
 			
 			//success
-			if (Utils.distance(startX, startY, currentX, currentY) >= MIN)
+			if (Utils.distance(startX, startY, currentX, currentY) >= MIN_DISTANCE)
 				return SUCCESS;
 			
 			//failure
 			return FAILURE;
-		}
-		
-		override public function reset():void {
-			started = false;
 		}
 	}
 }

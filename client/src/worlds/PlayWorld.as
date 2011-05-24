@@ -11,9 +11,12 @@ package worlds {
 	import networking.Net;
 	import entities.Bender;
 	import commands.Command;
+	import commands.MouseCommand;
 	import general.Utils;
 	import worlds.GameWorld;
 	import gestures.DragGesture;
+	import gestures.GestureProcessor;
+	import gestures.EarthGestureProcessor;
 	
 	public class PlayWorld extends World {
 		//worlds
@@ -53,11 +56,11 @@ package worlds {
 		private var d:Boolean = false;
 		private var w:Boolean = false;
 		private var s:Boolean = false;
-		private var mouse:Boolean = false;
 		private var c:Boolean = false;
 		
 		//gestures
 		private var dragGesture:DragGesture = new DragGesture;
+		private var gestureProcessor:GestureProcessor;
 		
 		public function PlayWorld(isP1:Boolean) {
 			//set variables
@@ -73,6 +76,12 @@ package worlds {
 			
 			//log
 			Utils.log("isP1 " + isP1);
+			
+			//temp
+			if (!isP1)
+				gestureProcessor = new EarthGestureProcessor(isP1);
+			else
+				gestureProcessor = new GestureProcessor(isP1);
 		}
 		
 		/**
@@ -183,8 +192,11 @@ package worlds {
 					case Command.D:
 						insertCommand(new Command(!isP1, c, lastEnemyFrame));
 						break;
-					case Command.BLANK:
-						insertCommand(new Command(!isP1, c, lastEnemyFrame, cMouseX, cMouseY));
+					case MouseCommand.BLANK:
+					case MouseCommand.BEGIN:
+					case MouseCommand.CANCEL:
+					case MouseCommand.CLICK_HOLD_RELEASE:
+						insertCommand(new MouseCommand(!isP1, c, lastEnemyFrame, cMouseX, cMouseY));
 						break;
 				}
 			}
@@ -194,10 +206,13 @@ package worlds {
 		 * Updates true, perceived, and inputs
 		 */
 		override public function update():void {
+			//set elapsed
 			FP.elapsed = GameWorld.FRAME_ELAPSED;
+			
+			//updates
 			updateTrueWorld();
 			updatePerceivedWorld();
-			updateInputs();
+			updateInputsAndGestures();
 		}
 		
 		/**
@@ -356,19 +371,21 @@ package worlds {
 		 * Adds to current command list
 		 * Adds new commands to the message to be sent
 		 */
-		private function updateInputs():void {
+		private function updateInputsAndGestures():void {
+			/*
 			//temp display shit
 			if (Input.check(Key.C) != c) {
 				c = !c;
 				if (c)
 					printCommands();
 			}
+			*/
 			
 			//determine is should run
 			if (!shouldRender)
 				return;
 			
-			//update gestures
+			//update drag gesture
 			dragGesture.update(Input.mouseX, Input.mouseY, Input.mouseDown, perceivedUpdateCount);
 			
 			//declare variables
@@ -406,6 +423,10 @@ package worlds {
 				}
 				*/
 				
+				//update gesture processor
+				gestureProcessor.update(toSendFrame, Input.mouseX, Input.mouseY, false, perceivedUpdateCount);
+
+				
 				//reset
 				lostWindowFocus = false;
 			}else {
@@ -440,12 +461,21 @@ package worlds {
 					addMyCommand(new Command(isP1, Command.MOUSE_TOGGLE, toSendFrame, Input.mouseX, Input.mouseY));
 				}
 				*/
+				
+				//update gestures
+				gestureProcessor.update(toSendFrame, Input.mouseX, Input.mouseY, Input.mouseDown, perceivedUpdateCount);
+			}
+			
+			//gesture processor
+			var command:Command = gestureProcessor.check();
+			if (command) {
+				addMyCommand(command);
 			}
 			
 			//blank commands
 			if (!m) {
 				if (lastMyFrame + FRAME_MIN_SEND < toSendFrame || dragGesture.check())
-					addMyCommand(new Command(isP1, Command.BLANK, toSendFrame, Input.mouseX, Input.mouseY));
+					addMyCommand(new MouseCommand(isP1, MouseCommand.BLANK, toSendFrame, Input.mouseX, Input.mouseY));
 			}
 			
 			//send message
@@ -473,6 +503,7 @@ package worlds {
 			Net.conn.removeMessageHandler(Net.MESSAGE_COMMANDS, null);
 		}
 		
+		/*
 		public function displayCommands():String {
 			var result:String = "====================FRAMES====================\n";
 			result += "true: " + trueFrame + "\nperceived:" + perceivedFrame + "\n";
@@ -504,5 +535,6 @@ package worlds {
 		public function printCommands():void {
 			Utils.log(displayCommands());
 		}
+		*/
 	}
 }
