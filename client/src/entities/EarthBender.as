@@ -10,6 +10,9 @@ package entities {
 	import general.Utils;
 	
 	public class EarthBender extends Bender {
+		//animations
+		public static const CREATE_DUST_ANIMATION:String = "createdust";
+		
 		//collision
 		public static const COLLISION_TYPE:String = "earthbender";
 		
@@ -45,7 +48,7 @@ package entities {
 			preventBoulderOverlap = false;
 			
 			//animation
-			sprite_map.add(PrepareBoulderMove.ANIMATION.name, PrepareBoulderMove.ANIMATION.frames, PrepareBoulderMove.ANIMATION.speed, PrepareBoulderMove.ANIMATION.loop);
+			sprite_map.add(EarthBender.CREATE_DUST_ANIMATION, [1, 4, 7, 10], 33, true);
 		}
 		
 		override protected function resetShouldVariables():void {

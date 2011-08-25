@@ -1,15 +1,12 @@
 package moves {
-	import animations.Animation;
 	import flashpunk.Rollbackable;
 	
 	import entities.Bender;
+	import entities.EarthBender;
 	import entities.Dust;
 	import worlds.GameWorld;
 	
 	public class PrepareBoulderMove extends Move {
-		//animation
-		public static var ANIMATION:Animation = new Animation("Create Dust", [1, 4, 7, 10], 33, true);
-		
 		//variables
 		public var x:Number;
 		public var y:Number;
@@ -36,14 +33,14 @@ package moves {
 			dust.y = y - dust.halfHeight;
 			
 			//animate bender
-			player.play(PrepareBoulderMove.ANIMATION.name);
+			player.play(EarthBender.CREATE_DUST_ANIMATION);
 		}
 		
 		override public function finish():void {
 			if(hasDust) {
 				dust.visible = false;
 				hasDust = false;
-				player.play(Bender.WALK);
+				player.play(Bender.WALK_ANIMATION);
 			}
 		}
 		

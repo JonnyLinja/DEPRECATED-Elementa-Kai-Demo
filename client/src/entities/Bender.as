@@ -13,11 +13,11 @@ package entities {
 	
 	public class Bender extends MovableEntity {
 		//animation constants
-		public static const WALK:String = "walk";
-		public static const WALK_DOWN:String = "walkdown";
-		public static const WALK_UP:String = "walkup";
-		public static const WALK_LEFT:String = "walkleft";
-		public static const WALK_RIGHT:String = "walkright";
+		public static const WALK_ANIMATION:String = "walk";
+		public static const WALK_DOWN_ANIMATION:String = "walkdown";
+		public static const WALK_UP_ANIMATION:String = "walkup";
+		public static const WALK_LEFT_ANIMATION:String = "walkleft";
+		public static const WALK_RIGHT_ANIMATION:String = "walkright";
 		public static const LOOK_DOWN:int = 1;
 		public static const LOOK_LEFT:int = 4;
 		public static const LOOK_RIGHT:int = 7;
@@ -58,11 +58,11 @@ package entities {
 				sprite_map = new Spritemap(image, iWidth, iHeight);
 				
 				//animations
-				sprite_map.add(WALK_DOWN, [0, 1, 2], 33, true);
-				sprite_map.add(WALK_LEFT, [3, 4, 5], 33, true);
-				sprite_map.add(WALK_RIGHT, [6, 7, 8], 33, true);
-				sprite_map.add(WALK_UP, [9, 10, 11], 33, true);
-				sprite_map.play(WALK_DOWN);
+				sprite_map.add(WALK_DOWN_ANIMATION, [0, 1, 2], 33, true);
+				sprite_map.add(WALK_LEFT_ANIMATION, [3, 4, 5], 33, true);
+				sprite_map.add(WALK_RIGHT_ANIMATION, [6, 7, 8], 33, true);
+				sprite_map.add(WALK_UP_ANIMATION, [9, 10, 11], 33, true);
+				sprite_map.play(WALK_DOWN_ANIMATION);
 			}
 		}
 			
@@ -184,7 +184,7 @@ package entities {
 		
 		protected function updateDirection():void {
 			//determine if walking
-			if (sprite_map.currentAnim != "" && sprite_map.currentAnim != WALK && sprite_map.currentAnim != WALK_DOWN && sprite_map.currentAnim != WALK_LEFT && sprite_map.currentAnim != WALK_RIGHT && sprite_map.currentAnim != WALK_UP)
+			if (sprite_map.currentAnim != "" && sprite_map.currentAnim != WALK_ANIMATION && sprite_map.currentAnim != WALK_DOWN_ANIMATION && sprite_map.currentAnim != WALK_LEFT_ANIMATION && sprite_map.currentAnim != WALK_RIGHT_ANIMATION && sprite_map.currentAnim != WALK_UP_ANIMATION)
 				return;
 			
 			//direction
@@ -192,18 +192,18 @@ package entities {
 				case 7:
 				case 8:
 				case 9:
-					sprite_map.play(WALK_UP);
+					sprite_map.play(WALK_UP_ANIMATION);
 					break;
 				case 4:
-					sprite_map.play(WALK_LEFT);
+					sprite_map.play(WALK_LEFT_ANIMATION);
 					break;
 				case 1:
 				case 2:
 				case 3:
-					sprite_map.play(WALK_DOWN);
+					sprite_map.play(WALK_DOWN_ANIMATION);
 					break;
 				case 6:
-					sprite_map.play(WALK_RIGHT);
+					sprite_map.play(WALK_RIGHT_ANIMATION);
 					break;
 				default:
 					break;
@@ -233,6 +233,8 @@ package entities {
 			downForce.rollback(b.downForce);
 			
 			//animation frame
+			sprite_map.play(b.sprite_map.currentAnim);
+			sprite_map.index = b.sprite_map.index;
 			
 			//mouse
 			mouseX = b.mouseX;
