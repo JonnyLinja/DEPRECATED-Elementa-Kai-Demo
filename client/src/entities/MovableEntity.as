@@ -1,16 +1,17 @@
 package entities {
 	import flash.geom.Point;
 	import flashpunk.Rollbackable;
-	
-	import flashpunk.Entity;
 	import flashpunk.FP;
+	import flashpunk.Entity;
 	
 	import physics.ForceVector;
 	import physics.WindForce;
 	
+	import entities.SpriteMapEntity;
+	
 	import general.Utils;
 	
-	public class MovableEntity extends Entity {		
+	public class MovableEntity extends SpriteMapEntity {		
 		//forces
 		public var moveForce:ForceVector = new ForceVector();
 		public var windForce:WindForce = new WindForce();

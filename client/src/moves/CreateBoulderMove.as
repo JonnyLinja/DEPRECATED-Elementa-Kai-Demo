@@ -1,17 +1,19 @@
 package moves {
-	import worlds.GameWorld;
+	import entities.Bender;
 	import entities.Boulder;
 	
+	import worlds.GameWorld;
+	
 	public class CreateBoulderMove extends Move {
-		//constants
-		public static const startup:int = 7;
-		public static const cooldown:int = 5;
+		//variables
+		public var x:Number;
+		public var y:Number;
 		
-		public function CreateBoulderMove(world:GameWorld) {
-			super(world);
+		public function CreateBoulderMove(world:GameWorld, player:Bender) {
+			super(world, player);
 		}
 		
-		public function create(x:Number, y:Number):void {
+		override public function execute():void {
 			//create boulder
 			var boulder:Boulder = world.create(Boulder, true) as Boulder;
 			boulder.x = x - boulder.halfWidth;

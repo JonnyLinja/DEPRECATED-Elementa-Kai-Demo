@@ -3,7 +3,7 @@ package entities {
 	
 	public class Boulder extends MovableEntity {
 		//collision
-		public static const COLLISION_TYPE_BOULDER_CREATING:String = "boulder creating";
+		//public static const COLLISION_TYPE_BOULDER_CREATING:String = "boulder creating";
 		public static const COLLISION_TYPE_BOULDER_STILL:String = "boulder still";
 		public static const COLLISION_TYPE_BOULDER_MOVING:String = "boulder moving";
 		
@@ -20,15 +20,14 @@ package entities {
 		
 		//sprite
 		[Embed(source = '../../images/boulder.PNG')]
-		private static const image:Class; 
-		private var sprite_map:Spritemap = new Spritemap(image, W, H);
+		private static const image:Class;
 		
 		public function Boulder(x:Number = 0, y:Number = 0) {
 			//super
 			super(x, y);
 			
 			//sprite
-			graphic = sprite_map;
+			sprite_map = new Spritemap(image, W, H);
 			
 			//size
 			width = W;

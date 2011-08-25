@@ -5,6 +5,8 @@ package entities {
 	import flashpunk.FP;
 	import flashpunk.Entity;
 	
+	import moves.PrepareBoulderMove;
+	
 	import general.Utils;
 	
 	public class EarthBender extends Bender {
@@ -41,6 +43,9 @@ package entities {
 			
 			//overlap
 			preventBoulderOverlap = false;
+			
+			//animation
+			sprite_map.add(PrepareBoulderMove.ANIMATION.name, PrepareBoulderMove.ANIMATION.frames, PrepareBoulderMove.ANIMATION.speed, PrepareBoulderMove.ANIMATION.loop);
 		}
 		
 		override protected function resetShouldVariables():void {

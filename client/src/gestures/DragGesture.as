@@ -12,29 +12,40 @@ package gestures {
 		public function DragGesture() {
 		}
 		
-		override public function update(x:Number, y:Number, mouseDown:Boolean, ratio:int = 1):void {
+		/**
+		 * 
+		 * @param	x
+		 * @param	y
+		 * @param	mouse		ignores
+		 * @param	flick		ignores
+		 * @param	ratio
+		 */
+		override public function update(x:Number, y:Number, mouse:Boolean, flick:Boolean, ratio:int = 1):void {
 			//first time
 			if (!started) {
 				startX = x;
 				startY = y;
 				started = true;
+				
+				currentX = x;
+				currentY = y;
+			}else {
+				currentX = x;
+				currentY = y;
 			}
-			
-			currentX = x;
-			currentY = y;
 		}
 		
 		override public function check():int {
 			//not ready
 			if (!started)
-				return NOT_READY;
+				return NOT_STARTED;
 			
 			//success
 			if (Utils.distance(startX, startY, currentX, currentY) >= MIN_DISTANCE)
 				return SUCCESS;
 			
 			//failure
-			return FAILURE;
+			return FAIL;
 		}
 	}
 }

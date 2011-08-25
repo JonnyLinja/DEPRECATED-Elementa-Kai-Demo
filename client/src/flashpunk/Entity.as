@@ -967,6 +967,9 @@ package flashpunk
 			//position
 			x = e.x;
 			y = e.y;
+			
+			//visibility
+			visible = e.visible;
 		}
 		
 		/**

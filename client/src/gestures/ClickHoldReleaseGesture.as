@@ -1,12 +1,14 @@
 package gestures {
+	import flashpunk.Rollbackable;
+	
 	public class ClickHoldReleaseGesture extends Gesture {
 		//constants
 		private static const MIN_FRAME_COUNT:int = 7;
 		private static const LEEWAY:int = 5;
 		
 		//variables
-		private var failed:Boolean = false;
 		private var succeeded:Boolean = false;
+		private var failed:Boolean = false;
 		private var frame_count:int = 0;
 		
 		public function ClickHoldReleaseGesture() {
@@ -40,14 +42,14 @@ package gestures {
 			return false;
 		}
 		
-		override public function update(x:Number, y:Number, mouseDown:Boolean, ratio:int = 1):void {
+		override public function update(x:Number, y:Number, mouse:Boolean, flick:Boolean, ratio:int = 1):void {
 			//if need update -> reset required
-			if (failed || succeeded)
+			if (succeeded)
 				return;
 			
 			if (!started) {
 				//start
-				if(mouseDown) {
+				if(mouse) {
 					startX = x;
 					startY = y;
 					started = true;
@@ -59,7 +61,7 @@ package gestures {
 					return;
 				}
 				
-				if (!mouseDown) {
+				if (!mouse) {
 					//finish
 					
 					//frame count check
@@ -77,16 +79,20 @@ package gestures {
 		}
 		
 		override public function check():int {
+			//not ready
+			if (!started)
+				return NOT_STARTED;
+			
 			//success
 			if (succeeded)
 				return SUCCESS;
 			
-			//failure
+			//fail
 			if (failed)
-				return FAILURE;
+				return FAIL;
 			
 			//default
-			return NOT_READY;
+			return STARTED;
 		}
 		
 		override public function reset():void {
@@ -94,9 +100,22 @@ package gestures {
 			super.reset();
 			
 			//reset
-			succeeded = false;
 			failed = false;
+			succeeded = false;
 			frame_count = 0;
+		}
+		
+		override public function rollback(orig:Rollbackable):void {
+			//super
+			super.rollback(orig);
+			
+			//cast
+			var g:ClickHoldReleaseGesture = orig as ClickHoldReleaseGesture;
+			
+			//rollback
+			failed = g.failed;
+			succeeded = g.succeeded;
+			frame_count = g.frame_count;
 		}
 	}
 }

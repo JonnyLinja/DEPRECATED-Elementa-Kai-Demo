@@ -1,8 +1,10 @@
 package worlds {
-	import commands.AirCommandProcessor;
 	import commands.Command;
-	import commands.CommandProcessor;
-	import commands.EarthCommandProcessor;
+	
+	import processors.BenderProcessor;
+	import processors.AirProcessor;
+	import processors.EarthProcessor;
+	
 	import flashpunk.Rollbackable;
 	
 	import entities.Bender;
@@ -31,14 +33,14 @@ package worlds {
 		private var player2:Bender;
 		
 		//commands
-		private var processor1:CommandProcessor;
-		private var processor2:CommandProcessor;
+		private var processor1:BenderProcessor;
+		private var processor2:BenderProcessor;
 		
 		public function GameWorld() {
 			player1 = new AirBender(200, 10);
-			processor1 = new AirCommandProcessor(this, player1);
+			processor1 = new AirProcessor(this, player1);
 			player2 = new EarthBender(150, 10);
-			processor2 = new EarthCommandProcessor(this, player2);
+			processor2 = new EarthProcessor(this, player2);
 			add(player1);
 			add(player2);
 			add(new Wall( -FP.width, -FP.height, FP.width * 3, FP.height)); //top
@@ -56,9 +58,9 @@ package worlds {
 		}
 		
 		override public function update():void {
-			updateLists();
 			processor1.update();
 			processor2.update();
+			updateLists();
 			super.update();
 		}
 		

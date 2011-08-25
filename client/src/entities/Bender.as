@@ -13,13 +13,15 @@ package entities {
 	
 	public class Bender extends MovableEntity {
 		//animation constants
+		public static const WALK:String = "walk";
 		public static const WALK_DOWN:String = "walkdown";
 		public static const WALK_UP:String = "walkup";
 		public static const WALK_LEFT:String = "walkleft";
 		public static const WALK_RIGHT:String = "walkright";
-		
-		//spritemap
-		protected var sprite_map:Spritemap;
+		public static const LOOK_DOWN:int = 1;
+		public static const LOOK_LEFT:int = 4;
+		public static const LOOK_RIGHT:int = 7;
+		public static const LOOK_UP:int = 10;
 		
 		//commands
 		public var moveLeft:Boolean;
@@ -54,7 +56,6 @@ package entities {
 			if (image) {
 				//sprite
 				sprite_map = new Spritemap(image, iWidth, iHeight);
-				graphic = sprite_map;
 				
 				//animations
 				sprite_map.add(WALK_DOWN, [0, 1, 2], 33, true);
@@ -182,6 +183,11 @@ package entities {
 		}
 		
 		protected function updateDirection():void {
+			//determine if walking
+			if (sprite_map.currentAnim != "" && sprite_map.currentAnim != WALK && sprite_map.currentAnim != WALK_DOWN && sprite_map.currentAnim != WALK_LEFT && sprite_map.currentAnim != WALK_RIGHT && sprite_map.currentAnim != WALK_UP)
+				return;
+			
+			//direction
 			switch(Utils.direction(centerX, centerY, mouseX, mouseY)) {
 				case 7:
 				case 8:
@@ -202,6 +208,10 @@ package entities {
 				default:
 					break;
 			}
+			
+			//walk or not
+			if (moveForce.x.velocity == 0 && moveForce.y.velocity == 0)
+				sprite_map.setAnimFrame(sprite_map.currentAnim, 1);
 		}
 		
 		override public function rollback(orig:Rollbackable):void {

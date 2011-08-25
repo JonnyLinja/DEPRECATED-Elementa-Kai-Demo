@@ -1,12 +1,12 @@
 package worlds {
 	import flash.geom.Point;
+	import gestures.Gesture;
 	
 	import playerio.Message;
 	
-	import flashpunk.utils.Input;
-	import flashpunk.utils.Key;
 	import flashpunk.World;
 	import flashpunk.FP;
+	import flashpunk.utils.Input;
 	
 	import networking.Net;
 	import entities.Bender;
@@ -15,8 +15,8 @@ package worlds {
 	import general.Utils;
 	import worlds.GameWorld;
 	import gestures.DragGesture;
-	import gestures.GestureProcessor;
-	import gestures.EarthGestureProcessor;
+	import gestures.FlickGesture;
+	import inputs.BenderInput;
 	
 	public class PlayWorld extends World {
 		//worlds
@@ -44,23 +44,17 @@ package worlds {
 		private var nextFrameTime:uint = 0; //for perceived
 		
 		//game loop
-		private var perceivedUpdateCount:int; //number of times perceived was updates during this frame
+		private var perceivedUpdateCount:int; //number of times perceived was updated during this frame
 		
 		//boolean checks
 		private var isP1:Boolean;
 		private var shouldRender:Boolean = true;
-		private var lostWindowFocus:Boolean = false;
-		
-		//my inputs
-		private var a:Boolean = false;
-		private var d:Boolean = false;
-		private var w:Boolean = false;
-		private var s:Boolean = false;
-		private var c:Boolean = false;
 		
 		//gestures
 		private var dragGesture:DragGesture = new DragGesture;
-		private var gestureProcessor:GestureProcessor;
+		
+		//inputs
+		private var myInputs:BenderInput;
 		
 		public function PlayWorld(isP1:Boolean) {
 			//set variables
@@ -74,14 +68,19 @@ package worlds {
 			trueWorld.beginSync();
 			perceivedWorld.beginSync();
 			
+			//inputs
+			myInputs = new BenderInput(isP1); //eventually specific to bender type
+			
 			//log
 			Utils.log("isP1 " + isP1);
 			
+			/*
 			//temp
 			if (!isP1)
 				gestureProcessor = new EarthGestureProcessor(isP1);
 			else
 				gestureProcessor = new GestureProcessor(isP1);
+			*/
 		}
 		
 		/**
@@ -89,7 +88,7 @@ package worlds {
 		 */
 		override public function focusLost():void {
 			Input.clear();
-			lostWindowFocus = true;
+			myInputs.lostWindowFocus = true;
 		}
 		
 		/**
@@ -192,10 +191,7 @@ package worlds {
 					case Command.D:
 						insertCommand(new Command(!isP1, c, lastEnemyFrame));
 						break;
-					case MouseCommand.BLANK:
-					case MouseCommand.BEGIN:
-					case MouseCommand.CANCEL:
-					case MouseCommand.CLICK_HOLD_RELEASE:
+					default:
 						insertCommand(new MouseCommand(!isP1, c, lastEnemyFrame, cMouseX, cMouseY));
 						break;
 				}
@@ -385,102 +381,28 @@ package worlds {
 			if (!shouldRender)
 				return;
 			
-			//update drag gesture
-			dragGesture.update(Input.mouseX, Input.mouseY, Input.mouseDown, perceivedUpdateCount);
-			
 			//declare variables
 			var toSendFrame:uint = perceivedFrame + FRAME_DELAY;
 			
-			if (lostWindowFocus) {
-				//left
-				if (a) {
-					a = false;
-					addMyCommand(new Command(isP1, Command.A, toSendFrame));
-				}
-				
-				//right
-				if (d) {
-					d = false;
-					addMyCommand(new Command(isP1, Command.D, toSendFrame));
-				}
-				
-				//up
-				if (w) {
-					w = false;
-					addMyCommand(new Command(isP1, Command.W, toSendFrame));
-				}
-				
-				//down
-				if (s) {
-					s = false;
-					addMyCommand(new Command(isP1, Command.S, toSendFrame));
-				}
-				/*
-				//mouse
-				if (mouse) {
-					mouse = false;
-					addMyCommand(new Command(isP1, Command.MOUSE_TOGGLE, toSendFrame, Input.mouseX, Input.mouseY));
-				}
-				*/
-				
-				//update gesture processor
-				gestureProcessor.update(toSendFrame, Input.mouseX, Input.mouseY, false, perceivedUpdateCount);
-
-				
-				//reset
-				lostWindowFocus = false;
-			}else {
-				//left
-				if(Input.check(Key.A) != a) {
-					a = !a;
-					addMyCommand(new Command(isP1, Command.A, toSendFrame));
-				}
-				
-				//right
-				if(Input.check(Key.D) != d) {
-					d = !d;
-					addMyCommand(new Command(isP1, Command.D, toSendFrame));
-				}
-				
-				//up
-				if(Input.check(Key.W) != w) {
-					w = !w;
-					addMyCommand(new Command(isP1, Command.W, toSendFrame));
-				}
-				
-				//down
-				if(Input.check(Key.S) != s) {
-					s = !s;
-					addMyCommand(new Command(isP1, Command.S, toSendFrame));
-				}
-				
-				/*
-				//mouse
-				if (Input.mouseDown != mouse) {
-					mouse = !mouse;
-					addMyCommand(new Command(isP1, Command.MOUSE_TOGGLE, toSendFrame, Input.mouseX, Input.mouseY));
-				}
-				*/
-				
-				//update gestures
-				gestureProcessor.update(toSendFrame, Input.mouseX, Input.mouseY, Input.mouseDown, perceivedUpdateCount);
-			}
+			//update gestures (note these gestures don't care about mouse click)
+			dragGesture.update(Input.mouseX, Input.mouseY, false, false, perceivedUpdateCount);
 			
-			//gesture processor
-			var command:Command = gestureProcessor.check();
-			if (command) {
-				addMyCommand(command);
-			}
+			//update bender inputs
+			myInputs.update(toSendFrame, perceivedUpdateCount);
+			
+			//add my commands from the input class
+			while (myInputs.hasNext())
+				addMyCommand(myInputs.getNext());
 			
 			//blank commands
 			if (!m) {
-				if (lastMyFrame + FRAME_MIN_SEND < toSendFrame || dragGesture.check())
+				if (lastMyFrame + FRAME_MIN_SEND < toSendFrame || dragGesture.check() == Gesture.SUCCESS)
 					addMyCommand(new MouseCommand(isP1, MouseCommand.BLANK, toSendFrame, Input.mouseX, Input.mouseY));
 			}
 			
 			//send message
 			if (m) {
-				dragGesture.reset(); //only need to check distance if nothign else has been sent for a while
+				dragGesture.reset(); //only need to check distance if nothing else has been sent for a while
 				
 				Net.conn.sendMessage(m);
 				m = null;
