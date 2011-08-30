@@ -102,6 +102,7 @@ package processors {
 			click = p.click;
 			mouseX = p.mouseX;
 			mouseY = p.mouseY;
+			frameBuffer = p.frameBuffer;
 		}
 	}
 }

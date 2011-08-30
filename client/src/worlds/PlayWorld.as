@@ -7,6 +7,7 @@ package worlds {
 	import flashpunk.World;
 	import flashpunk.FP;
 	import flashpunk.utils.Input;
+	import flash.utils.*;
 	
 	import networking.Net;
 	import entities.Bender;
@@ -34,7 +35,7 @@ package worlds {
 		
 		//frames
 		private static const FRAME_DELAY:uint = 3; //how many frames to delay inputs by - has to be at least 1!
-		private static const FRAME_MIN_SEND:uint = 10; //tries sends mouse position
+		private static const FRAME_MIN_SEND:uint = 1; //tries sends mouse position - was set to 10!
 		private var trueFrame:uint = 0; //current frame of true
 		private var perceivedFrame:uint = 0; //current frame of perceived
 		private var lastEnemyFrame:uint = 0; //last frame received by enemy
@@ -179,7 +180,8 @@ package worlds {
 			//increment true max
 			lastEnemyFrame += m.getUInt(0);
 			
-			//Utils.log("frame difference is " + (perceivedFrame - lastEnemyFrame));
+			//if((perceivedFrame - lastEnemyFrame) > 0)
+				//Utils.log("frame difference is " + (perceivedFrame - lastEnemyFrame));
 			
 			//loop insert new command
 			for (var pos:int=3; pos<length; pos++) {
@@ -202,6 +204,8 @@ package worlds {
 		 * Updates true, perceived, and inputs
 		 */
 		override public function update():void {
+			var stime:int = getTimer();
+			
 			//set elapsed
 			FP.elapsed = GameWorld.FRAME_ELAPSED;
 			
@@ -209,6 +213,12 @@ package worlds {
 			updateTrueWorld();
 			updatePerceivedWorld();
 			updateInputsAndGestures();
+			
+			var ftime:int = getTimer();
+			var ttime:int = (ftime-stime);
+			
+			//if(ttime != 0)
+				//Utils.log(stime + " -> " + ftime + " = " + ttime);
 		}
 		
 		/**
