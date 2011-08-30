@@ -41,26 +41,24 @@ package physics {
 		public function applyAcceleration():void {
 			x.applyAcceleration();
 			y.applyAcceleration();
-			applyMax();
 		}
 		
 		public function applyDecceleration():void {
 			x.applyDeceleration();
 			y.applyDeceleration();
-			applyMax();
 		}
 		
-		public function applyMax():void {
+		public function applyMax():Boolean {
 			//determine if has max
 			if (max <= 0)
-				return;
+				return false;
 			
 			//store magnitude
 			var magnitude:Number = Formulas.magnitude(x.velocity, y.velocity);
 			
 			//determine if necessary
 			if (magnitude <= max)
-				return;
+				return false;
 			
 			//calculate ratio
 			var ratio:Number = max / magnitude;
@@ -69,6 +67,8 @@ package physics {
 			//apply ratio
 			x.velocity *= ratio;
 			y.velocity *= ratio;
+			
+			return true;
 		}
 		
 		public function rollback(orig:Rollbackable):void {

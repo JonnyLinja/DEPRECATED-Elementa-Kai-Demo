@@ -16,6 +16,9 @@ package entities {
 		public var moveForce:ForceVector = new ForceVector();
 		public var windForce:WindForce = new WindForce();
 		
+		//max
+		protected var reachedMax:Boolean = false;
+		
 		//overlap
 		protected var preventWallOverlap:Boolean = true;
 		
@@ -87,6 +90,9 @@ package entities {
 			
 			//rollback prevent
 			preventWallOverlap = e.preventWallOverlap;
+			
+			//rollback max
+			reachedMax = e.reachedMax;
 		}
 	}
 }

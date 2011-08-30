@@ -94,6 +94,7 @@ package entities {
 				type = Boulder.COLLISION_TYPE_BOULDER_STILL;
 				shouldBecomeStationary = false;
 				throwing = false;
+				reachedMax = false;
 			}
 		}
 		
@@ -105,7 +106,10 @@ package entities {
 			
 			//throw movement
 			if (throwing) {
-				moveForce.applyAcceleration();
+				if (!reachedMax) {
+					moveForce.applyAcceleration();
+					reachedMax = moveForce.applyMax();
+				}
 				x += moveForce.x.velocity;
 				y += moveForce.y.velocity;
 			}
