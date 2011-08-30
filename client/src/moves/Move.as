@@ -14,8 +14,8 @@ package moves {
 			this.player = player;
 		}
 		
-		public function execute():void {
-			
+		public function get duration():int {
+			return 0;
 		}
 		
 		public function finish():void {

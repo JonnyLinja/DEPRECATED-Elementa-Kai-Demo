@@ -19,11 +19,19 @@ package processors {
 		protected var a:Boolean = false;
 		protected var s:Boolean = false;
 		protected var d:Boolean = false;
+		protected var justToggledMouse:Boolean = false;
 		protected var click:Boolean = false;
 		protected var flick:Boolean = false;
 		
+		//mouse positions - meant for buffering perhaps?
+		protected var mouseX:Number;
+		protected var mouseY:Number;
+		
 		//moves
 		protected var currentMove:Move;
+		
+		//frame buffer
+		protected var frameBuffer:int = 0;
 		
 		public function BenderProcessor(world:GameWorld, player:Bender) {
 			this.world = world;
@@ -44,6 +52,13 @@ package processors {
 				player.moveUp = false;
 				player.moveDown = false;
 			}
+			
+			//decrement buffer
+			if (frameBuffer > 0)
+				frameBuffer--;
+			
+			//reset just click
+			justToggledMouse = false;
 		}
 		
 		public function add(c:Command):void {
@@ -65,9 +80,10 @@ package processors {
 			player.mouseX = c.x;
 			player.mouseY = c.y;
 			
-			if (c.type == MouseCommand.CLICK)
+			if (c.type == MouseCommand.CLICK) {
 				click = !click;
-			else if (c.type == MouseCommand.FLICK)
+				justToggledMouse = true;
+			}else if (c.type == MouseCommand.FLICK)
 				flick = !flick;
 		}
 		
@@ -81,8 +97,11 @@ package processors {
 			d = p.d;
 			w = p.w;
 			canMove = p.canMove;
+			justToggledMouse = p.justToggledMouse;
 			flick = p.flick;
 			click = p.click;
+			mouseX = p.mouseX;
+			mouseY = p.mouseY;
 		}
 	}
 }

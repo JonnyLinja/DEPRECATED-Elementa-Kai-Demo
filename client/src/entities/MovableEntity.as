@@ -84,6 +84,9 @@ package entities {
 			
 			//rollback forces
 			moveForce.rollback(e.moveForce);
+			
+			//rollback prevent
+			preventWallOverlap = e.preventWallOverlap;
 		}
 	}
 }

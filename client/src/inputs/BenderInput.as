@@ -118,7 +118,7 @@ package inputs {
 					//flick started, determine stop
 					if (flickGesture.check() == Gesture.SUCCESS) {
 						flick = !flick;
-						Utils.log("flick stop");
+						//Utils.log("flick stop");
 						list.push(new MouseCommand(isP1, MouseCommand.FLICK, toSendFrame, Input.mouseX, Input.mouseY));
 						flickGesture.reset();
 					}
@@ -126,7 +126,7 @@ package inputs {
 					//flick finished, determine start
 					if (flickGesture.check() == Gesture.STARTED) {
 						flick = !flick;
-						Utils.log("flick start");
+						//Utils.log("flick start");
 						list.push(new MouseCommand(isP1, MouseCommand.FLICK, toSendFrame, Input.mouseX, Input.mouseY));
 					}
 				}

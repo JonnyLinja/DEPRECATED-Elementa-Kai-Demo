@@ -12,6 +12,7 @@ package entities {
 	public class EarthBender extends Bender {
 		//animations
 		public static const CREATE_DUST_ANIMATION:String = "createdust";
+		public static const CREATE_BOULDER_ANIMATION:String = "createboulder";
 		
 		//collision
 		public static const COLLISION_TYPE:String = "earthbender";
@@ -49,6 +50,7 @@ package entities {
 			
 			//animation
 			sprite_map.add(EarthBender.CREATE_DUST_ANIMATION, [1, 4, 7, 10], 33, true);
+			sprite_map.add(EarthBender.CREATE_BOULDER_ANIMATION, [4, 7, 10, 1], 8, true);
 		}
 		
 		override protected function resetShouldVariables():void {

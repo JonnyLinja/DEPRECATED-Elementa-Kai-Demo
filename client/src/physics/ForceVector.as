@@ -38,6 +38,18 @@ package physics {
 			y.deceleration = -y.velocity * ratio;
 		}
 		
+		public function applyAcceleration():void {
+			x.applyAcceleration();
+			y.applyAcceleration();
+			applyMax();
+		}
+		
+		public function applyDecceleration():void {
+			x.applyDeceleration();
+			y.applyDeceleration();
+			applyMax();
+		}
+		
 		public function applyMax():void {
 			//determine if has max
 			if (max <= 0)

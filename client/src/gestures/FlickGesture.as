@@ -1,10 +1,11 @@
 package gestures {
 	import general.Utils;
+	import flashpunk.Rollbackable;
 	
 	public class FlickGesture extends Gesture {
 		//constants
 		private static const MIN_SPEED:int = 100;
-		private static const MAX_SPEED:int = 50;
+		private static const MAX_SPEED:int = 1;
 		
 		//variables
 		protected var flickStart:Boolean = false;
@@ -64,6 +65,20 @@ package gestures {
 			
 			//reset
 			flickStart = false;
+		}
+		
+		override public function rollback(orig:Rollbackable):void {
+			//super
+			super.rollback(orig);
+			
+			//cast
+			var f:FlickGesture = orig as FlickGesture;
+			
+			//rollback
+			flickStart = f.flickStart;
+			currentX = f.currentX;
+			currentY = f.currentY;
+			frames =  f.frames;
 		}
 	}
 }

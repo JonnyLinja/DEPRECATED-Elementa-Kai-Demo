@@ -1,6 +1,7 @@
 package entities {
 	import flashpunk.Entity;
 	import flashpunk.graphics.Spritemap;
+	import flashpunk.Rollbackable;
 	
 	public class SpriteMapEntity extends Entity {
 		protected var _sprite_map:Spritemap; //since I'll be using sprite maps for everything, easier to put it here than redefining each time
@@ -24,6 +25,20 @@ package entities {
 		
 		public function play(animationType:String):void {
 			_sprite_map.play(animationType);
+		}
+		
+		override public function rollback(orig:Rollbackable):void {
+			super.rollback(orig);
+			
+			//declare
+			var e:SpriteMapEntity = orig as SpriteMapEntity;
+			
+			//animation frame
+			if (e.sprite_map.currentAnim) {
+				sprite_map.play(e.sprite_map.currentAnim);
+				sprite_map.index = e.sprite_map.index;
+			}else
+				sprite_map.frame = e.sprite_map.frame;
 		}
 	}
 }

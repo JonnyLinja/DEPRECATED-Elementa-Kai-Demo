@@ -13,7 +13,6 @@ package entities {
 	
 	public class Bender extends MovableEntity {
 		//animation constants
-		public static const WALK_ANIMATION:String = "walk";
 		public static const WALK_DOWN_ANIMATION:String = "walkdown";
 		public static const WALK_UP_ANIMATION:String = "walkup";
 		public static const WALK_LEFT_ANIMATION:String = "walkleft";
@@ -184,7 +183,7 @@ package entities {
 		
 		protected function updateDirection():void {
 			//determine if walking
-			if (sprite_map.currentAnim != "" && sprite_map.currentAnim != WALK_ANIMATION && sprite_map.currentAnim != WALK_DOWN_ANIMATION && sprite_map.currentAnim != WALK_LEFT_ANIMATION && sprite_map.currentAnim != WALK_RIGHT_ANIMATION && sprite_map.currentAnim != WALK_UP_ANIMATION)
+			if (sprite_map.currentAnim != "" && sprite_map.currentAnim != WALK_DOWN_ANIMATION && sprite_map.currentAnim != WALK_LEFT_ANIMATION && sprite_map.currentAnim != WALK_RIGHT_ANIMATION && sprite_map.currentAnim != WALK_UP_ANIMATION)
 				return;
 			
 			//direction
@@ -217,7 +216,7 @@ package entities {
 		override public function rollback(orig:Rollbackable):void {
 			super.rollback(orig);
 			
-			//declare
+			//cast
 			var b:Bender = orig as Bender;
 			
 			//move booleans
@@ -231,10 +230,6 @@ package entities {
 			rightForce.rollback(b.rightForce);
 			upForce.rollback(b.upForce);
 			downForce.rollback(b.downForce);
-			
-			//animation frame
-			sprite_map.play(b.sprite_map.currentAnim);
-			sprite_map.index = b.sprite_map.index;
 			
 			//mouse
 			mouseX = b.mouseX;

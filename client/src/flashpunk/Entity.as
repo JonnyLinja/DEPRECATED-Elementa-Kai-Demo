@@ -970,6 +970,9 @@ package flashpunk
 			
 			//visibility
 			visible = e.visible;
+			
+			//type
+			type = e.type;
 		}
 		
 		/**
