@@ -92,6 +92,7 @@ package entities {
 			if (throwing && shouldBecomeStationary) {
 				//Utils.log("reset boulder to stationary");
 				type = Boulder.COLLISION_TYPE_BOULDER_STILL;
+				preventWallOverlap = false;
 				shouldBecomeStationary = false;
 				throwing = false;
 				reachedMax = false;
