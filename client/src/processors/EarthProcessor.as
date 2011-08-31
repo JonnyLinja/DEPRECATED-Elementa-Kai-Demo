@@ -6,8 +6,8 @@ package processors {
 	import worlds.GameWorld;
 	
 	import gestures.Gesture;
-	import gestures.ClickHoldReleaseGesture;
-	import gestures.ClickFlickGesture;
+	import gestures.receive.ClickHoldReleaseGesture;
+	import gestures.receive.ClickFlickGesture;
 	
 	import moves.PrepareBoulderMove;
 	import moves.CreateBoulderMove;

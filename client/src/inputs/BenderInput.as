@@ -6,7 +6,7 @@ package inputs {
 	import commands.Command;
 	import commands.MouseCommand;
 	import gestures.Gesture;
-	import gestures.FlickGesture;
+	import gestures.send.FlickGesture;
 	
 	public class BenderInput {
 		//commands
@@ -40,7 +40,7 @@ package inputs {
 		}
 		
 		public function update(toSendFrame:int, frameCount:int):void {
-			flickGesture.update(Input.mouseX, Input.mouseY, false, false, frameCount);
+			flickGesture.update(Input.mouseX, Input.mouseY, false, frameCount);
 			
 			if (lostWindowFocus) {
 				//left

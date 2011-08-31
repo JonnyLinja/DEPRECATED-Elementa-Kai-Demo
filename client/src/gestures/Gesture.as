@@ -21,13 +21,6 @@ package gestures {
 			return startY;
 		}
 		
-		/**
-		 * @param	ratio		# of frames
-		 */
-		public function update(x:Number, y:Number, mouse:Boolean, flick:Boolean, ratio:int = 1):void {
-			
-		}
-		
 		public function check():int {
 			return NOT_STARTED;
 		}

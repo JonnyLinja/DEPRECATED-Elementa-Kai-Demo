@@ -17,8 +17,8 @@ package worlds {
 	import commands.MouseCommand;
 	import general.Utils;
 	import worlds.GameWorld;
-	import gestures.DragGesture;
-	import gestures.FlickGesture;
+	import gestures.send.DragGesture;
+	import gestures.send.FlickGesture;
 	import inputs.BenderInput;
 	
 	public class PlayWorld extends World {
@@ -401,7 +401,7 @@ package worlds {
 			var toSendFrame:uint = perceivedFrame + FRAME_DELAY;
 			
 			//update gestures (note these gestures don't care about mouse click)
-			dragGesture.update(Input.mouseX, Input.mouseY, false, false, perceivedUpdateCount);
+			dragGesture.update(Input.mouseX, Input.mouseY, false, perceivedUpdateCount);
 			
 			//update bender inputs
 			myInputs.update(toSendFrame, perceivedUpdateCount);
