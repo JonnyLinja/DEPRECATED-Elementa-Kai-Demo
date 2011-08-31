@@ -7,6 +7,7 @@ package worlds {
 	import flashpunk.World;
 	import flashpunk.FP;
 	import flashpunk.utils.Input;
+	import flashpunk.utils.Key;
 	
 	import flash.utils.getTimer;
 	
@@ -36,7 +37,7 @@ package worlds {
 		
 		//frames
 		private static const FRAME_DELAY:uint = 3; //how many frames to delay inputs by - has to be at least 1!
-		private static const FRAME_MIN_SEND:uint = 1; //tries sends mouse position - was set to 10!
+		private static const FRAME_MIN_SEND:uint = 10; //tries sends mouse position - was set to 10!
 		private var trueFrame:uint = 0; //current frame of true
 		private var perceivedFrame:uint = 0; //current frame of perceived
 		private var lastEnemyFrame:uint = 0; //last frame received by enemy
@@ -52,6 +53,7 @@ package worlds {
 		//boolean checks
 		private var isP1:Boolean;
 		private var shouldRender:Boolean = true;
+		private var c:Boolean;
 		
 		//gestures
 		private var dragGesture:DragGesture = new DragGesture;
@@ -382,14 +384,14 @@ package worlds {
 		 * Adds new commands to the message to be sent
 		 */
 		private function updateInputsAndGestures():void {
-			/*
+			
 			//temp display shit
 			if (Input.check(Key.C) != c) {
 				c = !c;
 				if (c)
 					printCommands();
 			}
-			*/
+			
 			
 			//determine is should run
 			if (!shouldRender)
@@ -439,30 +441,34 @@ package worlds {
 			Net.conn.removeMessageHandler(Net.MESSAGE_COMMANDS, null);
 		}
 		
-		/*
+		
 		public function displayCommands():String {
 			var result:String = "====================FRAMES====================\n";
 			result += "true: " + trueFrame + "\nperceived:" + perceivedFrame + "\n";
 			
 			result += "====================COMMANDS====================\n";
+			result += "frame\ttype\tplayer\tx\ty\n"
 			
 			//declare variables
-			var c:Command = firstCommand;
+			var cmd:Command = firstCommand;
 			
-			while (c) {
+			while (cmd) {
 				//print
-				result += c.frame + "\t" + c.type + "\t" + c.player + "\t" + c.x + "\t" + c.y + "\n";
-				if (c == trueCommand)
+				if (cmd is MouseCommand)
+					result += cmd.frame + "\t" + cmd.type + "\t" + cmd.player + "\t" + (cmd as MouseCommand).x + "\t" + (cmd as MouseCommand).y + "\n";
+				else
+					result += cmd.frame + "\t" + cmd.type + "\t" + cmd.player + "\n";
+				if (cmd == trueCommand)
 					result += "\ttrue\n";
-				if (c == perceivedCommand)
+				if (cmd == perceivedCommand)
 					result += "\tperceived\n";
-				if (c.prev && (c.prev).next != c)
+				if (cmd.prev && (cmd.prev).next != cmd)
 					result += "\tstructure error, prev.next != self\n";
-				if (c.next && (c.next).prev != c)
+				if (cmd.next && (cmd.next).prev != cmd)
 					result += "\tstructure error, next.prev != self\n";
 				
 				//increment
-				c = c.next;
+				cmd = cmd.next;
 			}
 			
 			return result;
@@ -471,6 +477,6 @@ package worlds {
 		public function printCommands():void {
 			Utils.log(displayCommands());
 		}
-		*/
+		
 	}
 }

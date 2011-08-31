@@ -1,8 +1,6 @@
 package flashpunk {
 	import flash.geom.Point;
 	
-	//consider making hit stuff static
-	
 	public class RollbackableEntity extends Entity implements Rollbackable {
 		/**
 		 * Collision did not occur
@@ -119,7 +117,9 @@ package flashpunk {
 			//ratio - may not need, might be able to fudge with 1-1 ratio
 			//right now set to use bigger of the two
 			//could set to use smaller no problem
-			/*
+			
+			var ratioX:int;
+			var ratioY:int;
 			if (width * height > e.width * e.height) {
 				ratioX = width;
 				ratioY = height;
@@ -127,10 +127,9 @@ package flashpunk {
 				ratioX = e.width;
 				ratioY = e.height;
 			}
-			*/
 			
-			var ratioX:int = 1;
-			var ratioY:int = 1;
+			//var ratioX:int = 1;
+			//var ratioY:int = 1;
 			
 			//Didn't divide by 2, but still seems to work? wtf? It should move too far away...but it's fine
 			//Leaving it for now!
