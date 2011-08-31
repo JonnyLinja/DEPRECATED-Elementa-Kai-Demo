@@ -1,4 +1,7 @@
 package worlds {
+	
+	//consider making the fps 20!
+	
 	import commands.Command;
 	
 	import processors.BenderProcessor;
@@ -14,7 +17,7 @@ package worlds {
 	import entities.Wall;
 	import entities.WaterBender;
 	
-	import flashpunk.World;
+	import flashpunk.RollbackableWorld;
 	
 	import flash.net.registerClassAlias;
 	import flash.utils.ByteArray;
@@ -23,7 +26,7 @@ package worlds {
 	import flashpunk.FP;
 	import general.Utils;
 	
-	public class GameWorld extends World {
+	public class GameWorld extends RollbackableWorld {
 		//frame constants
 		public static const FRAME_RATE:uint = 33; //~30 fps
 		public static const FRAME_ELAPSED:Number = FRAME_RATE / 1000;
@@ -37,6 +40,7 @@ package worlds {
 		private var processor2:BenderProcessor;
 		
 		public function GameWorld() {
+			FP.screen.color = 0x000000;
 			player1 = new AirBender(200, 10);
 			processor1 = new AirProcessor(this, player1);
 			player2 = new EarthBender(150, 10);

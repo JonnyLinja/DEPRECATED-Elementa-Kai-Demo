@@ -607,6 +607,7 @@ package flashpunk.debug
 						{
 							g.lineStyle(1, 0xFF0000);
 							g.drawRect((e.x - e.originX - FP.camera.x) * sx, (e.y - e.originY - FP.camera.y) * sy, e.width * sx, e.height * sy);
+							if (e.mask) e.mask.renderDebug(g);
 						}
 						g.lineStyle(1, 0x00FF00);
 						g.drawRect((e.x - FP.camera.x) * sx - 3, (e.y - FP.camera.y) * sy - 3, 6, 6);
@@ -618,6 +619,7 @@ package flashpunk.debug
 						{
 							g.lineStyle(1, 0xFFFFFF);
 							g.drawRect((e.x - e.originX - FP.camera.x) * sx, (e.y - e.originY - FP.camera.y) * sy, e.width * sx, e.height * sy);
+							if (e.mask) e.mask.renderDebug(g);
 						}
 						g.lineStyle(1, 0xFFFFFF);
 						g.drawRect((e.x - FP.camera.x) * sx - 3, (e.y - FP.camera.y) * sy - 3, 6, 6);
@@ -707,8 +709,6 @@ package flashpunk.debug
 		/** @private Update the FPS/frame timing panel text. */
 		private function updateFPSRead():void
 		{
-			//removetimingstuff
-			/*
 			_fpsReadText.text = "FPS: " + FP.frameRate.toFixed();
 			_fpsInfoText0.text =
 				"Update: " + String(FP._updateTime) + "ms\n" + 
@@ -717,7 +717,6 @@ package flashpunk.debug
 				"Game: " + String(FP._gameTime) + "ms\n" + 
 				"Flash: " + String(FP._flashTime) + "ms";
 			_memReadText.text = "MEM: " + Number(System.totalMemory/1024/1024).toFixed(2) + "MB";
-			*/
 		}
 		
 		/** @private Update the debug panel text. */

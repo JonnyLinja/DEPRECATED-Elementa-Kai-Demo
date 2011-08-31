@@ -56,18 +56,19 @@
 			FP.halfHeight = height/2;
 			FP.assignedFrameRate = frameRate;
 			FP.fixed = fixed;
+			FP.timeInFrames = fixed;
 			
 			// global game objects
 			FP.engine = this;
 			FP.screen = new Screen;
 			FP.bounds = new Rectangle(0, 0, width, height);
 			FP._world = new World;
+			Draw.resetTarget();
 			
-			// miscellanious startup stuff
+			// miscellaneous startup stuff
 			if (FP.randomSeed == 0) FP.randomizeSeed();
 			FP.entity = new Entity;
-			//removetimingstuff
-			//FP._time = getTimer();
+			FP._time = getTimer();
 			
 			// on-stage event listener
 			addEventListener(Event.ADDED_TO_STAGE, onStage);
@@ -89,7 +90,6 @@
 			if (FP.tweener.active && FP.tweener._tween) FP.tweener.updateTweens();
 			if (FP._world.active)
 			{
-				Tween.update();
 				if (FP._world._tween) FP._world.updateTweens();
 				FP._world.update();
 			}
@@ -107,9 +107,12 @@
 			if (!_frameLast) _frameLast = t;
 			
 			// render loop
+			//modified to not draw here - will be done in world render function
+			//FP.screen.swap();
 			//Draw.resetTarget();
 			//FP.screen.refresh();
 			if (FP._world.visible) FP._world.render();
+			//FP.screen.redraw();
 			
 			// more timing stuff
 			t = getTimer();
@@ -175,7 +178,7 @@
 			if (FP.fixed)
 			{
 				// fixed framerate
-				_skip = _rate * maxFrameSkip;
+				_skip = _rate * (maxFrameSkip + 1);
 				_last = _prev = getTimer();
 				_timer = new Timer(tickRate);
 				_timer.addEventListener(TimerEvent.TIMER, onTimer);
@@ -193,85 +196,64 @@
 		private function onEnterFrame(e:Event):void
 		{
 			// update timer
-			//removetimingstuff
-			//_time = _gameTime = getTimer();
-			FP.time = getTimer();
-			//FP._flashTime = _time - _flashTime;
-			//_updateTime = _time;
-			//FP.elapsed = (_time - _last) / 1000;
-			FP.elapsed = (FP.time - _last) / 1000;
-			//remove max elapsed and rate
-			//if (FP.elapsed > maxElapsed) FP.elapsed = maxElapsed;
-			//FP.elapsed *= FP.rate;
-			//_last = _time;
-			_last = FP.time;
+			_time = _gameTime = getTimer();
+			FP._flashTime = _time - _flashTime;
+			_updateTime = _time;
+			FP.elapsed = (_time - _last) / 1000;
+			if (FP.elapsed > maxElapsed) FP.elapsed = maxElapsed;
+			FP.elapsed *= FP.rate;
+			_last = _time;
 			
 			// update console
-			//removed console
-			//if (FP._console) FP._console.update();
+			if (FP._console) FP._console.update();
 			
 			// update loop
-			//remove pause
-			//if (!paused) update();
-			update();
+			if (!paused) update();
 			
 			// update input
 			Input.update();
 			
 			// update timer
-			//removetimingstuff
-			//_time = _renderTime = getTimer();
-			//FP._updateTime = _time - _updateTime;
+			_time = _renderTime = getTimer();
+			FP._updateTime = _time - _updateTime;
 			
 			// render loop
-			//remove pause
-			//if (!paused) render();
-			render();
+			if (!paused) render();
 			
 			// update timer
-			//removetimingstuff
-			//_time = _flashTime = getTimer();
-			//FP._renderTime = _time - _renderTime;
-			//FP._gameTime = _time - _gameTime;
+			_time = _flashTime = getTimer();
+			FP._renderTime = _time - _renderTime;
+			FP._gameTime = _time - _gameTime;
 		}
 		
 		/** @private Fixed framerate game loop. */
 		private function onTimer(e:TimerEvent):void
 		{
 			// update timer
-			//removetimingstuff
-			//_time = getTimer();
-			//_delta += (_time - _last);
-			//_last = _time;
-			FP.time = getTimer();
-			_delta += (FP.time - _last);
-			_last = FP.time;
+			_time = getTimer();
+			_delta += (_time - _last);
+			_last = _time;
 			
 			// quit if a frame hasn't passed
 			if (_delta < _rate) return;
 			
 			// update timer
-			//removetimingstuff
-			//_gameTime = _time;
-			//FP._flashTime = _time - _flashTime;
+			_gameTime = _time;
+			FP._flashTime = _time - _flashTime;
 			
 			// update console
 			if (FP._console) FP._console.update();
 			
 			// update loop
 			if (_delta > _skip) _delta = _skip;
-			while (_delta > _rate)
+			while (_delta >= _rate)
 			{
+				FP.elapsed = _rate * FP.rate * 0.001;
+				
 				// update timer
-				//removetimingstuff
-				//_updateTime = _time;
+				_updateTime = _time;
 				_delta -= _rate;
-				//FP.elapsed = (_time - _prev) / 1000;
-				FP.elapsed = (FP.time - _prev) / 1000;
-				if (FP.elapsed > maxElapsed) FP.elapsed = maxElapsed;
-				FP.elapsed *= FP.rate;
-				//_prev = _time;
-				_prev = FP.time;
+				_prev = _time;
 				
 				// update loop
 				if (!paused) update();
@@ -280,24 +262,20 @@
 				Input.update();
 				
 				// update timer
-				//removetimingstuff
-				//_time = getTimer();
-				FP.time = getTimer();
-				//FP._updateTime = _time - _updateTime;
+				_time = getTimer();
+				FP._updateTime = _time - _updateTime;
 			}
 			
 			// update timer
-			//removetimingstuff
-			//_renderTime = _time;
+			_renderTime = _time;
 			
 			// render loop
 			if (!paused) render();
 			
 			// update timer
-			//removetimingstuff
-			//_time = _flashTime = getTimer();
-			//FP._renderTime = _time - _renderTime;
-			//FP._gameTime = _time - _gameTime;
+			_time = _flashTime = getTimer();
+			FP._renderTime = _time - _renderTime;
+			FP._gameTime =  _time - _gameTime;
 		}
 		
 		/** @private Switch Worlds if they've changed. */
@@ -331,7 +309,7 @@
 		
 		// Timing information.
 		/** @private */ private var _delta:Number = 0;
-		/** @private */ //private var _time:Number; //removetimingstuff
+		/** @private */ private var _time:Number;
 		/** @private */ private var _last:Number;
 		/** @private */ private var _timer:Timer;
 		/** @private */ private var	_rate:Number;
@@ -339,11 +317,10 @@
 		/** @private */ private var _prev:Number;
 		
 		// Debug timing information.
-		//removetimingstuff
-		/** @private */ //private var _updateTime:uint;
-		/** @private */ //private var _renderTime:uint;
-		/** @private */ //private var _gameTime:uint;
-		/** @private */ //private var _flashTime:uint;
+		/** @private */ private var _updateTime:uint;
+		/** @private */ private var _renderTime:uint;
+		/** @private */ private var _gameTime:uint;
+		/** @private */ private var _flashTime:uint;
 		
 		// FrameRate tracking.
 		/** @private */ private var _frameLast:uint = 0;

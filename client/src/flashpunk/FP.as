@@ -25,7 +25,7 @@
 		/**
 		 * The FlashPunk major version.
 		 */
-		public static const VERSION:String = "1.4";
+		public static const VERSION:String = "1.6";
 		
 		/**
 		 * Width of the game.
@@ -53,6 +53,12 @@
 		public static var fixed:Boolean;
 		
 		/**
+		 * If times should be given in frames (as opposed to seconds).
+		 * Default is true in fixed timestep mode and false in variable timestep mode.
+		 */
+		public static var timeInFrames:Boolean;
+		
+		/**
 		 * The framerate assigned to the stage.
 		 */
 		public static var frameRate:Number;
@@ -63,12 +69,12 @@
 		public static var assignedFrameRate:Number;
 		
 		/**
-		 * Time elapsed since the last frame (non-fixed framerate only).
+		 * Time elapsed since the last frame (in seconds).
 		 */
 		public static var elapsed:Number;
 		
 		/**
-		 * Timescale applied to FP.elapsed (non-fixed framerate only).
+		 * Timescale applied to FP.elapsed.
 		 */
 		public static var rate:Number = 1;
 		
@@ -155,6 +161,23 @@
 			if (_pan == value) return;
 			_soundTransform.pan = _pan = value;
 			SoundMixer.soundTransform = _soundTransform;
+		}
+		
+		/**
+		 * Remove an element from an array
+		 * @return	True if element existed and has been removed, false if element was not in array.
+		 */
+		public static function remove(array:*, toRemove:*):Boolean
+		{
+			var i:int = array.indexOf(toRemove);
+			
+			if (i >= 0) {
+				array.splice(i, 1);
+			
+				return true;
+			} else {
+				return false;
+			}
 		}
 		
 		/**
@@ -564,9 +587,12 @@
 		 */
 		public static function getColorHSV(h:Number, s:Number, v:Number):uint
 		{
+			h = h < 0 ? 0 : (h > 1 ? 1 : h);
+			s = s < 0 ? 0 : (s > 1 ? 1 : s);
+			v = v < 0 ? 0 : (v > 1 ? 1 : v);
 			h = int(h * 360);
-			var hi:int = Math.floor(h / 60) % 6,
-				f:Number = h / 60 - Math.floor(h / 60),
+			var hi:int = int(h / 60) % 6,
+				f:Number = h / 60 - int(h / 60),
 				p:Number = (v * (1 - s)),
 				q:Number = (v * (1 - f * s)),
 				t:Number = (v * (1 - (1 - f) * s));
@@ -628,8 +654,6 @@
 		 * Sets a time flag.
 		 * @return	Time elapsed (in milliseconds) since the last time flag was set.
 		 */
-		//removetimingstuff
-		/*
 		public static function timeFlag():uint
 		{
 			var t:uint = getTimer(),
@@ -637,7 +661,7 @@
 			_time = t;
 			return e;
 		}
-		*/
+		
 		/**
 		 * The global Console object.
 		 */
@@ -709,6 +733,13 @@
 		 */
 		public static function tween(object:Object, values:Object, duration:Number, options:Object = null):MultiVarTween
 		{
+			if (options && options.hasOwnProperty("delay")) {
+				var delay:Number = options.delay;
+				delete options.delay;
+				FP.alarm(delay, function ():void { FP.tween(object, values, duration, options); });
+				return null;
+			}
+			
 			var type:uint = Tween.ONESHOT,
 				complete:Function = null,
 				ease:Function = null,
@@ -716,6 +747,7 @@
 			if (object is Tweener) tweener = object as Tweener;
 			if (options)
 			{
+				if (options is Function) complete = options as Function;
 				if (options.hasOwnProperty("type")) type = options.type;
 				if (options.hasOwnProperty("complete")) complete = options.complete;
 				if (options.hasOwnProperty("ease")) ease = options.ease;
@@ -898,13 +930,11 @@
 		/** @private */ internal static var _console:Console;
 		
 		// Time information.
-		//removetimingstuff
-		public static var time:uint;
-		/** @private */ //internal static var _time:uint;
-		/** @private */ //public static var _updateTime:uint;
-		/** @private */ //public static var _renderTime:uint;
-		/** @private */ //public static var _gameTime:uint;
-		/** @private */ //public static var _flashTime:uint;
+		/** @private */ internal static var _time:uint;
+		/** @private */ public static var _updateTime:uint;
+		/** @private */ public static var _renderTime:uint;
+		/** @private */ public static var _gameTime:uint;
+		/** @private */ public static var _flashTime:uint;
 		
 		// Bitmap storage.
 		/** @private */ private static var _bitmap:Object = { };

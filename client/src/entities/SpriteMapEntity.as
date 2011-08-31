@@ -1,9 +1,9 @@
 package entities {
-	import flashpunk.Entity;
+	import flashpunk.RollbackableEntity;
 	import flashpunk.graphics.Spritemap;
 	import flashpunk.Rollbackable;
 	
-	public class SpriteMapEntity extends Entity {
+	public class SpriteMapEntity extends RollbackableEntity {
 		protected var _sprite_map:Spritemap; //since I'll be using sprite maps for everything, easier to put it here than redefining each time
 		
 		public function SpriteMapEntity(x:Number = 0, y:Number = 0) {

@@ -7,7 +7,8 @@ package worlds {
 	import flashpunk.World;
 	import flashpunk.FP;
 	import flashpunk.utils.Input;
-	import flash.utils.*;
+	
+	import flash.utils.getTimer;
 	
 	import networking.Net;
 	import entities.Bender;
@@ -42,6 +43,7 @@ package worlds {
 		private var lastMyFrame:uint = 0; //last frame inputted by player
 		
 		//time
+		private var currentTime:uint = 0;
 		private var nextFrameTime:uint = 0; //for perceived
 		
 		//game loop
@@ -60,7 +62,7 @@ package worlds {
 		public function PlayWorld(isP1:Boolean) {
 			//set variables
 			this.isP1 = isP1;
-			nextFrameTime = FP.time;
+			nextFrameTime = getTimer();
 			
 			//message handler
 			Net.conn.addMessageHandler(Net.MESSAGE_COMMANDS, receiveEnemyCommands);
@@ -74,6 +76,8 @@ package worlds {
 			
 			//log
 			Utils.log("isP1 " + isP1);
+			
+			//perceivedWorld.camera.x = 100;
 			
 			/*
 			//temp
@@ -204,7 +208,7 @@ package worlds {
 		 * Updates true, perceived, and inputs
 		 */
 		override public function update():void {
-			var stime:int = getTimer();
+			currentTime = getTimer();
 			
 			//set elapsed
 			FP.elapsed = GameWorld.FRAME_ELAPSED;
@@ -215,7 +219,7 @@ package worlds {
 			updateInputsAndGestures();
 			
 			var ftime:int = getTimer();
-			var ttime:int = (ftime-stime);
+			var ttime:int = (ftime-currentTime);
 			
 			//if(ttime != 0)
 				//Utils.log(stime + " -> " + ftime + " = " + ttime);
@@ -322,7 +326,7 @@ package worlds {
 		 */
 		private function updatePerceivedWorld():void {
 			//should render
-			if (FP.time >= nextFrameTime)
+			if (currentTime >= nextFrameTime)
 				shouldRender = true;
 			else
 				return;
@@ -370,7 +374,7 @@ package worlds {
 				
 				//increment next frame
 				nextFrameTime += GameWorld.FRAME_RATE;
-			}while (FP.time >= nextFrameTime);
+			}while (currentTime >= nextFrameTime);
 		}
 		
 		/**
@@ -423,7 +427,7 @@ package worlds {
 		 * Renders the perceived world
 		 */
 		override public function render():void {
-			if(shouldRender)
+			if (shouldRender)
 				perceivedWorld.render();
 			shouldRender = false;
 		}

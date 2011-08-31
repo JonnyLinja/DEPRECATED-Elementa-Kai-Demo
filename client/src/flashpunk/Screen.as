@@ -20,13 +20,24 @@
 		public function Screen() 
 		{
 			// create screen buffers
-			_bitmap = new Bitmap(new BitmapData(FP.width, FP.height, false, 0), PixelSnapping.NEVER);
+			_bitmap[0] = new Bitmap(new BitmapData(FP.width, FP.height, false, 0), PixelSnapping.NEVER);
+			_bitmap[1] = new Bitmap(new BitmapData(FP.width, FP.height, false, 0), PixelSnapping.NEVER);
 			FP.engine.addChild(_sprite);
-			_sprite.addChild(_bitmap).visible = true;
-			FP.buffer = _bitmap.bitmapData;
+			_sprite.addChild(_bitmap[0]).visible = true;
+			_sprite.addChild(_bitmap[1]).visible = false;
+			FP.buffer = _bitmap[0].bitmapData;
 			_width = FP.width;
 			_height = FP.height;
 			update();
+		}
+		
+		/**
+		 * Swaps screen buffers.
+		 */
+		public function swap():void
+		{
+			_current = 1 - _current;
+			FP.buffer = _bitmap[_current].bitmapData;
 		}
 		
 		/**
@@ -36,6 +47,16 @@
 		{
 			// refreshes the screen
 			FP.buffer.fillRect(FP.bounds, _color);
+		}
+		
+		/**
+		 * Redraws the screen.
+		 */
+		public function redraw():void
+		{
+			// refresh the buffers
+			_bitmap[_current].visible = true;
+			_bitmap[1 - _current].visible = false;
 		}
 		
 		/** @private Re-applies transformation matrix. */
@@ -150,8 +171,8 @@
 		/**
 		 * Whether screen smoothing should be used or not.
 		 */
-		public function get smoothing():Boolean { return _bitmap.smoothing; }
-		public function set smoothing(value:Boolean):void { _bitmap.smoothing = value; }
+		public function get smoothing():Boolean { return _bitmap[0].smoothing; }
+		public function set smoothing(value:Boolean):void { _bitmap[0].smoothing = _bitmap[1].smoothing = value; }
 		
 		/**
 		 * Width of the screen.
@@ -179,12 +200,12 @@
 		 */
 		public function capture():Image
 		{
-			return new Image(_bitmap.bitmapData.clone());
+			return new Image(_bitmap[_current].bitmapData.clone());
 		}
 		
 		// Screen infromation.
 		/** @private */ private var _sprite:Sprite = new Sprite;
-		/** @private */ private var _bitmap:Bitmap;
+		/** @private */ private var _bitmap:Vector.<Bitmap> = new Vector.<Bitmap>(2);
 		/** @private */ private var _current:int = 0;
 		/** @private */ private var _matrix:Matrix = new Matrix;
 		/** @private */ private var _x:int;

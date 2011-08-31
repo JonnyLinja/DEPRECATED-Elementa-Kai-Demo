@@ -30,10 +30,10 @@
 		public function Tilemap(tileset:*, width:uint, height:uint, tileWidth:uint, tileHeight:uint) 
 		{
 			// set some tilemap information
-			_width = width - (width % tileWidth);
-			_height = height - (height % tileHeight);
-			_columns = _width / tileWidth;
-			_rows = _height / tileHeight;
+			_width = width;
+			_height = height;
+			_columns = Math.ceil(_width / tileWidth);
+			_rows = Math.ceil(_height / tileHeight);
 			_map = new BitmapData(_columns, _rows, false, 0);
 			_temp = _map.clone();
 			_tile = new Rectangle(0, 0, tileWidth, tileHeight);
@@ -47,8 +47,8 @@
 			if (tileset is Class) _set = FP.getBitmap(tileset);
 			else if (tileset is BitmapData) _set = tileset;
 			if (!_set) throw new Error("Invalid tileset graphic provided.");
-			_setColumns = uint(_set.width / tileWidth);
-			_setRows = uint(_set.height / tileHeight);
+			_setColumns = Math.ceil(_set.width / tileWidth);
+			_setRows = Math.ceil(_set.height / tileHeight);
 			_setCount = _setColumns * _setRows;
 		}
 		
@@ -173,17 +173,30 @@
 		/**
 		 * Draws a line of tiles
 		 *  
-		 * @param	x		The x coordinate to start
-		 * @param	y		The y coordinate to start
+		 * @param	x1		The x coordinate to start
+		 * @param	y1		The y coordinate to start
 		 * @param	x2		The x coordinate to end
 		 * @param	y2		The y coordinate to end
 		 * @param	id		The tiles id to draw
 		 * 
 		 */		
-		public function line(x:int, y:int, x2:int, y2:int, id:int):void
+		public function line(x1:int, y1:int, x2:int, y2:int, id:int):void
 		{
+			if(usePositions)
+			{
+				x1 /= _tile.width;
+				y1 /= _tile.height;
+				x2 /= _tile.width;
+				y2 /= _tile.height;
+			}
+			
+			x1 %= _columns;
+			y1 %= _rows;
+			x2 %= _columns;
+			y2 %= _rows;
+			
 			Draw.setTarget(_map);
-			Draw.line(x, y, x2, y2, id, 0);
+			Draw.line(x1, y1, x2, y2, id, 0);
 			updateAll();
 		}
 		
@@ -197,8 +210,21 @@
 		 * @param	id		The tiles id to draw
 		 * 
 		 */		
-		public function outlinedRectangle(x:int, y:int, width:int, height:int, id:int):void
+		public function setRectOutline(x:int, y:int, width:int, height:int, id:int):void
 		{
+			if(usePositions)
+			{
+				x /= _tile.width;
+				y /= _tile.height;
+				
+				// TODO: might want to use difference between converted start/end coordinates instead?
+				width /= _tile.width;
+				height /= _tile.height;
+			}
+			
+			x %= _columns;
+			y %= _rows;
+			
 			Draw.setTarget(_map);
 			Draw.line(x, y, x + width, y, id, 0);
 			Draw.line(x, y + height, x + width, y + height, id, 0);
@@ -208,9 +234,9 @@
 		}
 		
 		/**
-		 * Updates the whole tilemap. Used by floodFill, line and outlineRectangle. 
+		 * Updates the graphical cache for the whole tilemap.
 		 */		
-		protected function updateAll():void
+		public function updateAll():void
 		{
 			_rect.x = 0;
 			_rect.y = 0;
@@ -263,6 +289,8 @@
 		*/
 		public function loadFromString(str:String, columnSep:String = ",", rowSep:String = "\n"):void
 		{
+			var u:Boolean = usePositions;
+			usePositions = false;
 			var row:Array = str.split(rowSep),
 				rows:int = row.length,
 				col:Array, cols:int, x:int, y:int;
@@ -277,6 +305,8 @@
 					setTile(x, y, uint(col[x]));
 				}
 			}
+			
+			usePositions = u;
 		}
 		
 		/**
@@ -292,7 +322,7 @@
 			{
 				for (x = 0; x < _columns; x ++)
 				{
-					s += String(getTile(x, y));
+					s += String(_map.getPixel(x, y));
 					if (x != _columns - 1) s += columnSep;
 				}
 				if (y != _rows - 1) s += rowSep;
@@ -301,13 +331,18 @@
 		}
 		
 		/**
-		 * Gets the index of a tile, based on its column and row in the tileset.
+		 * Gets the 1D index of a tile from a 2D index (its column and row in the tileset image).
 		 * @param	tilesColumn		Tileset column.
 		 * @param	tilesRow		Tileset row.
 		 * @return	Index of the tile.
 		 */
 		public function getIndex(tilesColumn:uint, tilesRow:uint):uint
 		{
+			if (usePositions) {
+				tilesColumn /= _tile.width;
+				tilesRow /= _tile.height;
+			}
+			
 			return (tilesRow % _setRows) * _setColumns + (tilesColumn % _setColumns);
 		}
 		
@@ -360,8 +395,33 @@
 			}
 		}
 		
-		/** @private Used by shiftTiles to update a rectangle of tiles from the tilemap. */
-		private function updateRect(rect:Rectangle, clear:Boolean):void
+		/**
+		 * Get a subregion of the tilemap and return it as a new Tilemap.
+		 */
+		public function getSubMap (x:int, y:int, w:int, h:int):Tilemap
+		{
+			if (usePositions) {
+				x /= _tile.width;
+				y /= _tile.height;
+				w /= _tile.width;
+				h /= _tile.height;
+			}
+			
+			var newMap:Tilemap = new Tilemap(_set, w*_tile.width, h*_tile.height, _tile.width, _tile.height);
+			
+			_rect.x = x;
+			_rect.y = y;
+			_rect.width = w;
+			_rect.height = h;
+			
+			newMap._map.copyPixels(_map, _rect, FP.zero);
+			newMap.drawGraphic(-x * _tile.width, -y * _tile.height, this);
+			
+			return newMap;
+		}
+		
+		/** Updates the graphical cache of a region of the tilemap. */
+		public function updateRect(rect:Rectangle, clear:Boolean):void
 		{
 			var x:int = rect.x,
 				y:int = rect.y,
@@ -394,6 +454,28 @@
 		private function updateTile(column:uint, row:uint):void
 		{
 			setTile(column, row, _map.getPixel(column % _columns, row % _rows));
+		}
+		
+		/**
+		* Create a Grid object from this tilemap.
+		* @param	solidTiles		Array of tile indexes that should be solid.
+		* @return Grid
+		*/
+		public function createGrid(solidTiles:Array, cls:Class=null):Grid
+		{
+			if (cls === null) cls = Grid;
+			var grid:Grid = new cls(width, height, _tile.width, _tile.height, 0) as Grid;
+			for (var row:uint = 0; row < _rows; ++row)
+			{
+				for (var col:uint = 0; col < _columns; ++col)
+				{
+					if (solidTiles.indexOf(_map.getPixel(col, row)) !== -1)
+					{
+						grid.setTile(col, row, true);
+					}
+				}
+			}
+			return grid;
 		}
 		
 		/**

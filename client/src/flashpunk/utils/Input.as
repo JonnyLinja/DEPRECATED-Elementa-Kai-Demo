@@ -24,7 +24,7 @@
 		public static var lastKey:int;
 		
 		/**
-		 * The mouse cursor. Set to null (the default) if you set Mouse.cursor directly in your code.
+		 * The mouse cursor. Set to "hide" to hide the cursor. See the flash.ui.MouseCursor class for a list of all other possible values. Common values: "auto" or "button".
 		 */
 		public static var mouseCursor:String;
 		
@@ -117,6 +117,7 @@
 		{
 			if (input is String)
 			{
+				if (! _control[input]) return false;
 				var v:Vector.<int> = _control[input],
 					i:int = v.length;
 				while (i --)
@@ -142,6 +143,7 @@
 		{
 			if (input is String)
 			{
+				if (! _control[input]) return false;
 				var v:Vector.<int> = _control[input],
 					i:int = v.length;
 				while (i --)
@@ -162,6 +164,7 @@
 		{
 			if (input is String)
 			{
+				if (! _control[input]) return false;
 				var v:Vector.<int> = _control[input],
 					i:int = v.length;
 				while (i --)
@@ -193,6 +196,7 @@
 				FP.stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 				FP.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 				FP.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
+				FP.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 				_enabled = true;
 			}
 		}
@@ -207,7 +211,16 @@
 			if (mousePressed) mousePressed = false;
 			if (mouseReleased) mouseReleased = false;
 			
-			if (mouseCursor) Mouse.cursor = mouseCursor;
+			if (mouseCursor) {
+				if (mouseCursor == "hide") {
+					if (_mouseVisible) Mouse.hide();
+					_mouseVisible = false;
+				} else {
+					if (! _mouseVisible) Mouse.show();
+					if (Mouse.cursor != mouseCursor) Mouse.cursor = mouseCursor;
+					_mouseVisible = true;
+				}
+			}
 		}
 		
 		/**
@@ -289,6 +302,17 @@
 		    _mouseWheelDelta = e.delta;
 		}
 		
+		/** @private Event handler for mouse move events: only here for a bug workaround. */
+		private static function onMouseMove(e:MouseEvent):void
+		{
+			if (mouseCursor == "hide") {
+				Mouse.show();
+				Mouse.hide();
+			}
+			
+			FP.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+		}
+		
 		// Max amount of characters stored by the keystring.
 		/** @private */ private static const KEYSTRING_MAX:uint = 100;
 		
@@ -302,5 +326,6 @@
 		/** @private */ private static var _releaseNum:int = 0;
 		/** @private */ private static var _control:Object = {};
 		/** @private */ private static var _mouseWheelDelta:int = 0;
+		/** @private */ private static var _mouseVisible:Boolean = true;
 	}
 }

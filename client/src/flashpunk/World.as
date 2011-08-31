@@ -2,14 +2,13 @@
 {
 	import flash.geom.Point;
 	import flash.utils.Dictionary;
-	//import flashpunk.utils.Input;
-	import flashpunk.utils.Draw;
+	import flashpunk.utils.Input;
 	
 	/**
 	 * Updated by Engine, main game container that holds all currently active Entities.
 	 * Useful for organization, eg. "Menu", "Level1", etc.
 	 */
-	public class World extends Tweener implements Rollbackable
+	public class World extends Tweener
 	{
 		/**
 		 * If the render() loop is performed.
@@ -42,7 +41,7 @@
 		 */
 		public function end():void
 		{
-			removeAll();
+			
 		}
 		
 		/**
@@ -52,20 +51,8 @@
 		 */
 		override public function update():void 
 		{
-			// preupdate checks
+			// update the entities
 			var e:Entity = _updateFirst;
-			while (e)
-			{
-				if (e.active)
-				{
-					e.preUpdate();
-				}
-				
-				e = e._updateNext;
-			}
-			
-			//update the position, tween, and graphics of entities
-			e = _updateFirst;
 			while (e)
 			{
 				if (e.active)
@@ -85,10 +72,6 @@
 		 */
 		public function render():void 
 		{
-			//reset screen - taken from Engine.as
-			Draw.resetTarget();
-			FP.screen.refresh();
-			
 			// render the entities in order of depth
 			var e:Entity,
 				i:int = _layerList.length;
@@ -124,7 +107,7 @@
 		 */
 		public function get mouseX():int
 		{
-			return FP.screen.mouseX + FP.camera.x;
+			return FP.screen.mouseX + camera.x;
 		}
 		
 		/**
@@ -132,7 +115,7 @@
 		 */
 		public function get mouseY():int
 		{
-			return FP.screen.mouseY + FP.camera.y;
+			return FP.screen.mouseY + camera.y;
 		}
 		
 		/**
@@ -167,27 +150,6 @@
 			{
 				_remove[_remove.length] = e;
 				e = e._updateNext;
-			}
-			destroyMasterList();
-		}
-		
-		/**
-		 * Meant to be called on ending the world. Destroys the entire Master list.
-		 * Does not use updateLists because there's no need to -> done at the end of World
-		 */
-		public function destroyMasterList():void
-		{
-			//declare variables
-			var e:Entity = _firstEntity;
-			var n:Entity = null;
-			
-			//loop destroy
-			while (e) {
-				n = e._next;
-				e._next = null;
-				e._world = null;
-				e.removed();
-				e = n;
 			}
 		}
 		
@@ -264,8 +226,6 @@
 			var e:Entity = _recycled[classType];
 			if (e)
 			{
-				if(e._recycleNext)
-					(e._recycleNext)._recyclePrev = null;
 				_recycled[classType] = e._recycleNext;
 				e._recycleNext = null;
 			}
@@ -287,34 +247,6 @@
 		}
 		
 		/**
-		 * Returns the unrecycled Entity.
-		 * @param	e				The Entity to unrecycle.
-		 * @param	addToWorld		Add it to the World immediately.
-		 * @return	The Entity object.
-		 */
-		public function unrecycle(e:Entity, addToWorld:Boolean = true):Entity
-		{
-			//connect the surrounding elements
-			if(e._recycleNext)
-				(e._recycleNext)._recyclePrev = e._recyclePrev;
-			if(e._recyclePrev)
-				(e._recyclePrev)._recycleNext = e._recycleNext;
-			
-			//move head
-			if (e == _recycled[e._class])
-			{
-				_recycled[e._class] = e._recycleNext;
-			}
-			
-			//make connects null
-			e._recyclePrev = null;
-			e._recycleNext = null;
-			
-			if (addToWorld) return add(e);
-				return e;
-		}
-		
-		/**
 		 * Clears stored reycled Entities of the Class type.
 		 * @param	classType		The Class type to clear.
 		 */
@@ -326,7 +258,6 @@
 			{
 				n = e._recycleNext;
 				e._recycleNext = null;
-				e._recyclePrev = null;
 				e = n;
 			}
 			delete _recycled[classType];
@@ -477,32 +408,6 @@
 				if (e.collidePoint(e.x, e.y, pX, pY)) return e;
 				e = e._typeNext;
 			}
-			return null;
-		}
-		
-		/**
-		 * Returns the Entity at front which collides with the point.
-		 * @param	x		X position
-		 * @param	y		Y position
-		 * @return The Entity at front which collides with the point, or null if not found.
-		 */
-		public function frontCollidePoint(x:Number, y:Number):Entity
-		{
-			var e:Entity,
-			i:int = 0,
-			l:int = _layerList.length;
-			do
-			{
-				e = _renderFirst[_layerList[i]];
-				while (e)
-				{
-					if(e.collidePoint(e.x, e.y, x, y)) return e;
-					e = e._renderNext
-				}
-				if(i > l) break;
-			}
-			while(++i);
-			
 			return null;
 		}
 		
@@ -690,20 +595,23 @@
 		 * @param	y			Y position of the rectangle.
 		 * @param	width		Width of the rectangle.
 		 * @param	height		Height of the rectangle.
+		 * @param	ignore		Ignore this entity.
 		 * @return	The nearest Entity to the rectangle.
 		 */
-		public function nearestToRect(type:String, x:Number, y:Number, width:Number, height:Number):Entity
+		public function nearestToRect(type:String, x:Number, y:Number, width:Number, height:Number, ignore:Entity = null):Entity
 		{
 			var n:Entity = _typeFirst[type],
 				nearDist:Number = Number.MAX_VALUE,
 				near:Entity, dist:Number;
 			while (n)
 			{
-				dist = squareRects(x, y, width, height, n.x - n.originX, n.y - n.originY, n.width, n.height);
-				if (dist < nearDist)
-				{
-					nearDist = dist;
-					near = n;
+				if (n != ignore) {
+					dist = squareRects(x, y, width, height, n.x - n.originX, n.y - n.originY, n.width, n.height);
+					if (dist < nearDist)
+					{
+						nearDist = dist;
+						near = n;
+					}
 				}
 				n = n._typeNext;
 			}
@@ -727,11 +635,14 @@
 				y:Number = e.y - e.originY;
 			while (n)
 			{
-				dist = (x - n.x) * (x - n.x) + (y - n.y) * (y - n.y);
-				if (dist < nearDist)
+				if (n != e)
 				{
-					nearDist = dist;
-					near = n;
+					dist = (x - n.x) * (x - n.x) + (y - n.y) * (y - n.y);
+					if (dist < nearDist)
+					{
+						nearDist = dist;
+						near = n;
+					}
 				}
 				n = n._typeNext;
 			}
@@ -974,7 +885,7 @@
 				while (e)
 				{
 					into[n ++] = e;
-					e = e._updatePrev;
+					e = e._renderPrev;
 				}
 			}
 		}
@@ -1005,18 +916,7 @@
 		 */
 		public function getInstance(name:String):*
 		{
-			if (name)
-			{
-				for (var i:Object in _entityNames)
-				{
-					if (_entityNames[i] == name)
-					{
-						if (i._world == this) return i;
-						else delete _entityNames[i];
-					}
-				}
-			}
-			return null;
+			return _entityNames[name];
 		}
 		
 		/**
@@ -1058,23 +958,9 @@
 			{
 				for each (e in _add)
 				{
-					//add to master list
-					if (!e._created)
-					{
-						e._created = true;
-						addToMasterList(e);
-					}
-					
-					//add brand new Entity to recycled list
 					if (e._world)
-					{
-						e._world = null;
-						e._recycleNext = null;
-						_recycle[_recycle.length] = e;
 						continue;
-					}
 					
-					//add to update and render
 					addUpdate(e);
 					addRender(e);
 					if (e._type) addType(e);
@@ -1095,8 +981,6 @@
 						continue;
 					
 					e._recycleNext = _recycled[e._class];
-					if(e._recycleNext)
-						(e._recycleNext)._recyclePrev = e;
 					_recycled[e._class] = e;
 				}
 				_recycle.length = 0;
@@ -1108,106 +992,6 @@
 				if (_layerList.length > 1) FP.sort(_layerList, true);
 				_layerSort = false;
 			}
-		}
-		
-		/**
-		 * Initializes the sync point
-		 * Called after the preloaded Entities have been added
-		 */
-		public function beginSync():void {
-			_syncPoint = _lastEntity;
-		}
-		
-		/**
-		 * Ensures master lists are the same
-		 * Adds unrecycled entities from w to this world
-		 * @param	w
-		 */
-		public function synchronize(w:World):void
-		{
-			//default sync point
-			if (!w._syncPoint)
-				return;
-			
-			//increment to next
-			w._syncPoint = w._syncPoint._next;
-			
-			//loop
-			while (w._syncPoint) {
-				//add unrecycled
-				var e:Entity = new w._syncPoint._class;
-				e._world = this; //force it to be added as recycled
-				add(e);
-				
-				//increment
-				w._syncPoint = w._syncPoint._next;
-			}
-			
-			//update
-			updateLists();
-			
-			//set sync points
-			_syncPoint = _lastEntity;
-			w._syncPoint = w._lastEntity;
-		}
-		
-		/**
-		 * Rolls back primitive values of current World's Entities to the old World's Entities
-		 * Assumes both worlds have already been synchronized
-		 * @param	w	World to be rolled back to
-		 */
-		public function rollback(orig:Rollbackable):void
-		{
-			//declare vars
-			var w:World = orig as World;
-			var thisCurrentEntity:Entity = _firstEntity;
-			var oldCurrentEntity:Entity = w._firstEntity;
-			
-			//loop through all entities to be rolled back to
-			while(oldCurrentEntity)
-			{
-				//rollback
-				if (oldCurrentEntity._world && !thisCurrentEntity._world)
-				{
-					//unrecycle entity and rollback
-					unrecycle(thisCurrentEntity);
-					thisCurrentEntity.rollback(oldCurrentEntity);
-				}else if (!oldCurrentEntity._world && thisCurrentEntity._world)
-				{
-					//recycle entity
-					recycle(thisCurrentEntity);
-				}else if(oldCurrentEntity._world && thisCurrentEntity._world)
-				{
-					//just rollback
-					thisCurrentEntity.rollback(oldCurrentEntity);
-				}
-				
-				//increment
-				thisCurrentEntity = thisCurrentEntity._next;
-				oldCurrentEntity = oldCurrentEntity._next;
-			}
-			
-			//update lists
-			updateLists();
-			w.updateLists();
-		}
-		
-		/** @private Adds Entity to the master list. */
-		private function addToMasterList(e:Entity):void
-		{
-			// add to master list
-			if (_lastEntity) {
-				//not first entry into list
-				_lastEntity._next = e;
-				_lastEntity = e;
-			}else {
-				//first entry
-				_firstEntity = e;
-				_lastEntity = e;
-			}
-			
-			//cleanup
-			e._next = null;
 		}
 		
 		/** @private Adds Entity to the update list. */
@@ -1322,14 +1106,13 @@
 		/** @private Register's the Entity's instance name. */
 		internal function registerName(e:Entity):void
 		{
-			if (e._name) _entityNames[e] = e._name;
-			else unregisterName(e);
+			_entityNames[e._name] = e;
 		}
 		
 		/** @private Unregister's the Entity's instance name. */
 		internal function unregisterName(e:Entity):void
 		{
-			if (_entityNames[e]) delete _entityNames[e];
+			if (_entityNames[e._name] == e) delete _entityNames[e._name];
 		}
 		
 		/** @private Calculates the squared distance between two rectangles. */
@@ -1385,30 +1168,25 @@
 		}
 		
 		// Adding and removal.
-		/** @private */	private var _add:Vector.<Entity> = new Vector.<Entity>;
-		/** @private */	private var _remove:Vector.<Entity> = new Vector.<Entity>;
-		/** @private */	private var _recycle:Vector.<Entity> = new Vector.<Entity>;
-		
-		// Rollback information.
-		 /** @private */ private var _firstEntity:Entity;
-		 /** @private */ private var _lastEntity:Entity;
-		 /** @private */ private var _syncPoint:Entity;
+		/** @private */	internal var _add:Vector.<Entity> = new Vector.<Entity>; //changed to internal
+		/** @private */	internal var _remove:Vector.<Entity> = new Vector.<Entity>; //changed to internal
+		/** @private */	internal var _recycle:Vector.<Entity> = new Vector.<Entity>; //changed to internal
 		
 		// Update information.
-		/** @private */	private var _updateFirst:Entity;
-		/** @private */ private var _count:int;
+		/** @private */	internal var _updateFirst:Entity; //changed to internal
+		/** @private */	internal var _count:uint; //changed to internal
 		
 		// Render information.
 		/** @private */	private var _renderFirst:Array = [];
 		/** @private */	private var _renderLast:Array = [];
-		/** @private */	private var _layerList:Array = [];
+		/** @private */	internal var _layerList:Array = []; //changed to internal
 		/** @private */	private var _layerCount:Array = [];
-		/** @private */	private var _layerSort:Boolean;
+		/** @private */	internal var _layerSort:Boolean; //changed to internal
 		/** @private */	private var _tempArray:Array = [];
-		/** @private */	private var _classCount:Dictionary = new Dictionary;
+		/** @private */	internal var _classCount:Dictionary = new Dictionary; //changed to internal
 		/** @private */	internal var _typeFirst:Object = { };
 		/** @private */	private var _typeCount:Object = { };
-		/** @private */	private static var _recycled:Dictionary = new Dictionary;
+		/** @private */	internal static var _recycled:Dictionary = new Dictionary; //changed to internal
 		/** @private */	internal var _entityNames:Dictionary = new Dictionary;
 	}
 }

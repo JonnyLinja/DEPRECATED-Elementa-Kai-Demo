@@ -4,52 +4,16 @@ package flashpunk
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.Dictionary;
-	import flash.utils.getDefinitionByName;
 	import flash.utils.getQualifiedClassName;
-	
-	import flashpunk.graphics.*;
+	import flash.utils.getDefinitionByName;
 	import flashpunk.masks.*;
+	import flashpunk.graphics.*;
 	
 	/**
 	 * Main game Entity class updated by World.
 	 */
-	public class Entity extends Tweener implements Rollbackable
+	public class Entity extends Tweener
 	{
-		/**
-		 * Collision did not occur
-		 */
-		public const HIT_NONE:int = 0;
-		
-		/**
-		 * Collided along the top side
-		 */
-		public const HIT_TOP:int = 1;
-		
-		/**
-		 * Collided along the bottom side
-		 */
-		public const HIT_BOTTOM:int = 2;
-		
-		/**
-		 * Collided along the left side
-		 */
-		public const HIT_LEFT:int = 3;
-		
-		/**
-		 * Collided along the right side
-		 */
-		public const HIT_RIGHT:int = 4;
-		
-		/**
-		 * How far the Entity should move along the X axis next update
-		 */
-		public var shouldMoveX:Number;
-		
-		/**
-		 * How far the Entity should move along the Y axis next update
-		 */
-		public var shouldMoveY:Number;
-		
 		/**
 		 * If the Entity should render.
 		 */
@@ -129,41 +93,11 @@ package flashpunk
 		}
 		
 		/**
-		 * Called before update.
-		 * Used for checks that don't affect position.
-		 * Calls resetShouldVariables.
-		 */
-		public function preUpdate():void 
-		{
-			resetShouldVariables();
-		}
-		
-		/**
-		 * Resets should variables.
-		 * Called at start of preUpdate.
-		 */
-		protected function resetShouldVariables():void {
-			shouldMoveX = 0;
-			shouldMoveY = 0;
-		}
-		
-		/**
 		 * Updates the Entity.
-		 * Used for anything that does affect position.
-		 * Calls resolveShouldVariables.
 		 */
 		override public function update():void 
 		{
-			resolveShouldVariables();
-		}
-		
-		/**
-		 * Resolves should variables.
-		 * Called at start of update.
-		 */
-		protected function resolveShouldVariables():void {
-			x += shouldMoveX;
-			y += shouldMoveY;
+			
 		}
 		
 		/**
@@ -180,8 +114,8 @@ package flashpunk
 					_point.y = y;
 				}
 				else _point.x = _point.y = 0;
-				_camera.x = FP.camera.x;
-				_camera.y = FP.camera.y;
+				_camera.x = _world ? _world.camera.x : FP.camera.x;
+				_camera.y = _world ? _world.camera.y : FP.camera.y;
 				_graphic.render(renderTarget ? renderTarget : FP.buffer, _point, _camera);
 			}
 		}
@@ -195,18 +129,10 @@ package flashpunk
 		 */
 		public function collide(type:String, x:Number, y:Number):Entity
 		{
-			if (!_world && !_group) return null;
+			if (!_world) return null;
 			
-			var e:Entity;
-			if(_world)
-			{
-				e = _world._typeFirst[type];
-			}
-			else
-			{
-				e = _group._typeFirst[type];
-			}
-			if (!collidable || !e) return null;
+			var e:Entity = _world._typeFirst[type];
+			if (!e) return null;
 			
 			_x = this.x; _y = this.y;
 			this.x = x; this.y = y;
@@ -215,11 +141,11 @@ package flashpunk
 			{
 				while (e)
 				{
-					if (x - originX + width > e.x - e.originX
+					if (e.collidable && e !== this
+					&& x - originX + width > e.x - e.originX
 					&& y - originY + height > e.y - e.originY
 					&& x - originX < e.x - e.originX + e.width
-					&& y - originY < e.y - e.originY + e.height
-					&& e.collidable && e !== this)
+					&& y - originY < e.y - e.originY + e.height)
 					{
 						if (!e._mask || e._mask.collide(HITBOX))
 						{
@@ -235,11 +161,11 @@ package flashpunk
 			
 			while (e)
 			{
-				if (x - originX + width > e.x - e.originX
+				if (e.collidable && e !== this
+				&& x - originX + width > e.x - e.originX
 				&& y - originY + height > e.y - e.originY
 				&& x - originX < e.x - e.originX + e.width
-				&& y - originY < e.y - e.originY + e.height
-				&& e.collidable && e !== this)
+				&& y - originY < e.y - e.originY + e.height)
 				{
 					if (_mask.collide(e._mask ? e._mask : e.HITBOX))
 					{
@@ -262,12 +188,19 @@ package flashpunk
 		 */
 		public function collideTypes(types:Object, x:Number, y:Number):Entity
 		{
-			if (!_world && !_group) return null;
+			if (!_world) return null;
+			
 			var e:Entity;
-			for each (var type:String in types)
-			{
-				if ((e = collide(type, x, y))) return e;
+			
+			if (types is String) {
+				return collide(String(types), x, y);
+			} else if (types is Array || types is Vector.<String>) {
+				for each (var type:String in types)
+				{
+					if ((e = collide(type, x, y))) return e;
+				}
 			}
+			
 			return null;
 		}
 		
@@ -283,11 +216,11 @@ package flashpunk
 			_x = this.x; _y = this.y;
 			this.x = x; this.y = y;
 			
-			if (x - originX + width > e.x - e.originX
+			if (e.collidable
+			&& x - originX + width > e.x - e.originX
 			&& y - originY + height > e.y - e.originY
 			&& x - originX < e.x - e.originX + e.width
-			&& y - originY < e.y - e.originY + e.height
-			&& collidable && e.collidable)
+			&& y - originY < e.y - e.originY + e.height)
 			{
 				if (!_mask)
 				{
@@ -383,18 +316,10 @@ package flashpunk
 		 */
 		public function collideInto(type:String, x:Number, y:Number, array:Object):void
 		{
-			if (!_world && !_group) return;
+			if (!_world) return;
 			
-			var e:Entity;
-			if(_world)
-			{
-				e = _world._typeFirst[type];
-			}
-			else
-			{
-				e = _group._typeFirst[type];
-			}
-			if (!collidable || !e) return;
+			var e:Entity = _world._typeFirst[type];
+			if (!e) return;
 			
 			_x = this.x; _y = this.y;
 			this.x = x; this.y = y;
@@ -404,11 +329,11 @@ package flashpunk
 			{
 				while (e)
 				{
-					if (x - originX + width > e.x - e.originX
+					if (e.collidable && e !== this
+					&& x - originX + width > e.x - e.originX
 					&& y - originY + height > e.y - e.originY
 					&& x - originX < e.x - e.originX + e.width
-					&& y - originY < e.y - e.originY + e.height
-					&& e.collidable && e !== this)
+					&& y - originY < e.y - e.originY + e.height)
 					{
 						if (!e._mask || e._mask.collide(HITBOX)) array[n ++] = e;
 					}
@@ -420,11 +345,11 @@ package flashpunk
 			
 			while (e)
 			{
-				if (x - originX + width > e.x - e.originX
+				if (e.collidable && e !== this
+				&& x - originX + width > e.x - e.originX
 				&& y - originY + height > e.y - e.originY
 				&& x - originX < e.x - e.originX + e.width
-				&& y - originY < e.y - e.originY + e.height
-				&& e.collidable && e !== this)
+				&& y - originY < e.y - e.originY + e.height)
 				{
 					if (_mask.collide(e._mask ? e._mask : e.HITBOX)) array[n ++] = e;
 				}
@@ -444,122 +369,8 @@ package flashpunk
 		 */
 		public function collideTypesInto(types:Object, x:Number, y:Number, array:Object):void
 		{
-			if (!_world && !_group) return;
+			if (!_world) return;
 			for each (var type:String in types) collideInto(type, x, y, array);
-		}
-		
-		/**
-		 * Checks for collisions against a type
-		 * Calls callback with entity and the hitTest
-		 * @param	type
-		 * @param	callback
-		 * @param	preventOverlap
-		 */
-		public function checkCollide(type:String, preventOverlap:Boolean=false, callback:Function=null):void {
-			//declare variables
-			var collisionList:Vector.<Entity> = new Vector.<Entity>();
-			var intersect:Point = null;
-			
-			//populate vector
-			collideInto(type, x, y, collisionList);
-			
-			//loop through vector
-			for each (var e:Entity in collisionList) {
-				if (callback != null) {
-					intersect = getIntersectRect(e);
-					callback(e, hitTest(e, preventOverlap, intersect), intersect);
-				}
-			}
-		}
-		
-		/**
-		 * Returns which side was hit
-		 * Assumes that the two Entites DO ALREADY COLLIDE
-		 * Sets shouldMoveX and shouldMoveY if preventOverlap is true
-		 * @param	e
-		 * @param	preventOverlap
-		 * @return
-		 */
-		public function hitTest(e:Entity, preventOverlap:Boolean=false, intersect:Point=null):int {
-			if (!intersect)
-				intersect = getIntersectRect(e);
-			//ratio - may not need, might be able to fudge with 1-1 ratio
-			//right now set to use bigger of the two
-			//could set to use smaller no problem
-			/*
-			if (width * height > e.width * e.height) {
-				ratioX = width;
-				ratioY = height;
-			}else {
-				ratioX = e.width;
-				ratioY = e.height;
-			}
-			*/
-			
-			var ratioX:int = 1;
-			var ratioY:int = 1;
-			
-			//Didn't divide by 2, but still seems to work? wtf? It should move too far away...but it's fine
-			//Leaving it for now!
-			
-			//exclude
-			if ((intersect.x / ratioY) <= (intersect.y / ratioX)) {
-				//horizontal
-				if (x < e.x) {
-					//left
-					if(preventOverlap)
-						shouldMoveX -= intersect.x;
-					return HIT_RIGHT;
-				}else {
-					//right
-					if(preventOverlap)
-						shouldMoveX += intersect.x;
-					return HIT_LEFT;
-				}
-			}else {
-				//vertical
-				if (y < e.y) {
-					//up
-					if(preventOverlap)
-						shouldMoveY -= intersect.y;
-					return HIT_BOTTOM;
-				}else {
-					//down
-					if(preventOverlap)
-						shouldMoveY += intersect.y;
-					return HIT_TOP;
-				}
-			}
-		}
-		
-		/**
-		 * Returns point with the size of the intersecting collision rectangle
-		 * @param	e
-		 * @return
-		 */
-		protected function getIntersectRect(e:Entity):Point {
-			//declare variables
-			var intersectionWidth:Number = 0;
-			var intersectionHeight:Number = 0;
-			
-			//horizontal
-			if (x < e.x)
-				intersectionWidth = Math.abs(x + width - e.x);
-			else if (e.x != x)
-				intersectionWidth = Math.abs(e.x + e.width - x);
-			else
-				intersectionWidth = Math.min(width, e.width);
-			
-			//vertical
-			if (y < e.y)
-				intersectionHeight = Math.abs(y + height - e.y);
-			else if (e.y != y)
-				intersectionHeight = Math.abs(e.y + e.height - y);
-			else
-				intersectionHeight = Math.min(height, e.height);
-			
-			//return point
-			return new Point(intersectionWidth, intersectionHeight);
 		}
 		
 		/**
@@ -567,7 +378,7 @@ package flashpunk
 		 */
 		public function get onCamera():Boolean
 		{
-			return collideRect(x, y, FP.camera.x, FP.camera.y, FP.width, FP.height);
+			return collideRect(x, y, _world.camera.x, _world.camera.y, FP.width, FP.height);
 		}
 		
 		/**
@@ -576,14 +387,6 @@ package flashpunk
 		public function get world():World
 		{
 			return _world;
-		}
-		
-		/**
-		 * The Group object this Entity has been added to.
-		 */
-		public function get group():Group
-		{
-			return _group;
 		}
 		
 		/**
@@ -633,16 +436,14 @@ package flashpunk
 		public function set layer(value:int):void
 		{
 			if (_layer == value) return;
-			if (!_world && !_group)
+			if (!_world)
 			{
 				_layer = value;
 				return;
 			}
-			if(_world) _world.removeRender(this);
-			else _group.removeRender(this);
+			_world.removeRender(this);
 			_layer = value;
-			if(_world) _world.addRender(this);
-			else _group.addRender(this);
+			_world.addRender(this);
 		}
 		
 		/**
@@ -652,22 +453,14 @@ package flashpunk
 		public function set type(value:String):void
 		{
 			if (_type == value) return;
-			if (!_world && !_group)
+			if (!_world)
 			{
 				_type = value;
 				return;
 			}
-			if (_type)
-			{
-				if(_world) _world.removeType(this);
-				else _group.removeType(this);
-			}
+			if (_type) _world.removeType(this);
 			_type = value;
-			if (value)
-			{
-				if(_world) _world.addType(this);
-				else _group.addType(this);
-			}
+			if (value) _world.addType(this);
 		}
 		
 		/**
@@ -816,10 +609,10 @@ package flashpunk
 		 * Moves the Entity by the amount, retaining integer values for its x and y.
 		 * @param	x			Horizontal offset.
 		 * @param	y			Vertical offset.
-		 * @param	solidType	An optional collision type to stop flush against upon collision.
+		 * @param	solidType	An optional collision type (or array of types) to stop flush against upon collision.
 		 * @param	sweep		If sweeping should be used (prevents fast-moving objects from going through solidType).
 		 */
-		public function moveBy(x:Number, y:Number, solidType:String = null, sweep:Boolean = false):void
+		public function moveBy(x:Number, y:Number, solidType:Object = null, sweep:Boolean = false):void
 		{
 			_moveX += x;
 			_moveY += y;
@@ -832,12 +625,12 @@ package flashpunk
 				var sign:int, e:Entity;
 				if (x != 0)
 				{
-					if (collidable && (sweep || collide(solidType, this.x + x, this.y)))
+					if (sweep || collideTypes(solidType, this.x + x, this.y))
 					{
 						sign = x > 0 ? 1 : -1;
 						while (x != 0)
 						{
-							if ((e = collide(solidType, this.x + sign, this.y)))
+							if ((e = collideTypes(solidType, this.x + sign, this.y)))
 							{
 								if (moveCollideX(e)) break;
 								else this.x += sign;
@@ -850,12 +643,12 @@ package flashpunk
 				}
 				if (y != 0)
 				{
-					if (collidable && (sweep || collide(solidType, this.x, this.y + y)))
+					if (sweep || collideTypes(solidType, this.x, this.y + y))
 					{
 						sign = y > 0 ? 1 : -1;
 						while (y != 0)
 						{
-							if ((e = collide(solidType, this.x, this.y + sign)))
+							if ((e = collideTypes(solidType, this.x, this.y + sign)))
 							{
 								if (moveCollideY(e)) break;
 								else this.y += sign;
@@ -878,10 +671,10 @@ package flashpunk
 		 * Moves the Entity to the position, retaining integer values for its x and y.
 		 * @param	x			X position.
 		 * @param	y			Y position.
-		 * @param	solidType	An optional collision type to stop flush against upon collision.
+		 * @param	solidType	An optional collision type (or array of types) to stop flush against upon collision.
 		 * @param	sweep		If sweeping should be used (prevents fast-moving objects from going through solidType).
 		 */
-		public function moveTo(x:Number, y:Number, solidType:String = null, sweep:Boolean = false):void
+		public function moveTo(x:Number, y:Number, solidType:Object = null, sweep:Boolean = false):void
 		{
 			moveBy(x - this.x, y - this.y, solidType, sweep);
 		}
@@ -891,10 +684,10 @@ package flashpunk
 		 * @param	x			X target.
 		 * @param	y			Y target.
 		 * @param	amount		Amount to move.
-		 * @param	solidType	An optional collision type to stop flush against upon collision.
+		 * @param	solidType	An optional collision type (or array of types) to stop flush against upon collision.
 		 * @param	sweep		If sweeping should be used (prevents fast-moving objects from going through solidType).
 		 */
-		public function moveTowards(x:Number, y:Number, amount:Number, solidType:String = null, sweep:Boolean = false):void
+		public function moveTowards(x:Number, y:Number, amount:Number, solidType:Object = null, sweep:Boolean = false):void
 		{
 			_point.x = x - this.x;
 			_point.y = y - this.y;
@@ -951,47 +744,19 @@ package flashpunk
 		public function get name():String { return _name; }
 		public function set name(value:String):void
 		{
-			if (_world) _world.registerName(this);
-			else _group.registerName(this);
+			if (_name == value) return;
+			if (_name && _world) _world.unregisterName(this);
 			_name = value;
+			if (_name && _world) _world.registerName(this);
 		}
 		
-		/**
-		 * Rolls back primitive values of current Entity to oldEntity
-		 * @param	oldEntity	entity to be rolled back to
-		 */
-		public function rollback(orig:Rollbackable):void {
-			//declare variables
-			var e:Entity = orig as Entity;
-			
-			//position
-			x = e.x;
-			y = e.y;
-			
-			//visibility
-			visible = e.visible;
-			
-			//type
-			type = e.type;
-		}
-		
-		/**
-		 * Prints out the primitive values that are to be rolled back
-		 * For debugging purposes
-		 * @return printout
-		 */
-		public function print():String {
-			return "";
-		}
+		public function getClass ():Class { return _class; }
 		
 		// Entity information.
-		/** @private */ internal var _created:Boolean; //to determine if should add to the master list
-		/** @private */ internal var _next:Entity; //master list
 		/** @private */ internal var _class:Class;
 		/** @private */ internal var _world:World;
-		/** @private */ internal var _group:Group;
-		/** @private */ internal var _type:String = "";
-		/** @private */ internal var _name:String = "";
+		/** @private */ internal var _type:String;
+		/** @private */ internal var _name:String;
 		/** @private */ internal var _layer:int;
 		/** @private */ internal var _updatePrev:Entity;
 		/** @private */ internal var _updateNext:Entity;
@@ -999,7 +764,6 @@ package flashpunk
 		/** @private */ internal var _renderNext:Entity;
 		/** @private */ internal var _typePrev:Entity;
 		/** @private */ internal var _typeNext:Entity;
-		/** @private */ internal var _recyclePrev:Entity;
 		/** @private */ internal var _recycleNext:Entity;
 		
 		// Collision information.
