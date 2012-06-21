@@ -21,6 +21,11 @@
 	public class Engine extends MovieClip
 	{
 		/**
+		 * Priroity of event listeners
+		 */
+		public static var priority:int = -3000;
+		
+		/**
 		 * If the game should stop updating/rendering.
 		 */
 		public var paused:Boolean = false;
@@ -71,7 +76,7 @@
 			FP._time = getTimer();
 			
 			// on-stage event listener
-			addEventListener(Event.ADDED_TO_STAGE, onStage);
+			addEventListener(Event.ADDED_TO_STAGE, onStage, false, Engine.priority);
 		}
 		
 		/**
@@ -157,8 +162,8 @@
 			removeEventListener(Event.ADDED_TO_STAGE, onStage);
 			
 			// add focus change listeners
-			stage.addEventListener(Event.ACTIVATE, onActivate);
-			stage.addEventListener(Event.DEACTIVATE, onDeactivate);
+			stage.addEventListener(Event.ACTIVATE, onActivate, false, Engine.priority);
+			stage.addEventListener(Event.DEACTIVATE, onDeactivate, false, Engine.priority);
 			
 			// set stage properties
 			FP.stage = stage;
@@ -181,14 +186,14 @@
 				_skip = _rate * (maxFrameSkip + 1);
 				_last = _prev = getTimer();
 				_timer = new Timer(tickRate);
-				_timer.addEventListener(TimerEvent.TIMER, onTimer);
+				_timer.addEventListener(TimerEvent.TIMER, onTimer, false, Engine.priority);
 				_timer.start();
 			}
 			else
 			{
 				// nonfixed framerate
 				_last = getTimer();
-				addEventListener(Event.ENTER_FRAME, onEnterFrame);
+				addEventListener(Event.ENTER_FRAME, onEnterFrame, false, Engine.priority);
 			}
 		}
 		

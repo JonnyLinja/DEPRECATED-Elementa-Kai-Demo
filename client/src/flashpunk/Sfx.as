@@ -12,6 +12,11 @@
 	public class Sfx 
 	{
 		/**
+		 * Priority of event listeners
+		 */
+		public static var priority:int = -2000;
+		
+		/**
 		 * Optional callback function for when the sound finishes playing.
 		 */
 		public var complete:Function;
@@ -53,7 +58,7 @@
 			if (_channel)
 			{
 				addPlaying();
-				_channel.addEventListener(Event.SOUND_COMPLETE, onComplete);
+				_channel.addEventListener(Event.SOUND_COMPLETE, onComplete, false, Sfx.priority);
 			}
 			_looping = false;
 			_position = 0;
@@ -94,7 +99,7 @@
 			if (_channel)
 			{
 				addPlaying();
-				_channel.addEventListener(Event.SOUND_COMPLETE, onComplete);
+				_channel.addEventListener(Event.SOUND_COMPLETE, onComplete, false, Sfx.priority);
 			}
 			_position = 0;
 		}

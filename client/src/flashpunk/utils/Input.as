@@ -13,6 +13,11 @@
 	public class Input
 	{
 		/**
+		 * Priority of event listeners
+		 */
+		public static var priority:int = -1000;
+		
+		/**
 		 * An updated string containing the last 100 characters pressed on the keyboard.
 		 * Useful for creating text input fields, such as highscore entries, etc.
 		 */
@@ -191,12 +196,12 @@
 		{
 			if (!_enabled && FP.stage)
 			{
-				FP.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-				FP.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
-				FP.stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
-				FP.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
-				FP.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
-				FP.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+				FP.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false, Input.priority);
+				FP.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp, false, Input.priority);
+				FP.stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown, false, Input.priority);
+				FP.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp, false, Input.priority);
+				FP.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel, false, Input.priority);
+				FP.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove, false, Input.priority);
 				_enabled = true;
 			}
 		}

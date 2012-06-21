@@ -86,7 +86,11 @@ package flashpunk {
 		 * @param	callback
 		 * @param	preventOverlap
 		 */
-		public function checkCollide(type:String, preventOverlap:Boolean=false, callback:Function=null):void {
+		public function checkCollide(type:String, preventOverlap:Boolean = false, callback:Function = null):void {
+			//needs callback
+			if (callback == null)
+				return;
+			
 			//declare variables
 			var collisionList:Vector.<Entity> = new Vector.<Entity>();
 			var intersect:Point = null;
@@ -96,10 +100,8 @@ package flashpunk {
 			
 			//loop through vector
 			for each (var e:Entity in collisionList) {
-				if (callback != null) {
-					intersect = getIntersectRect(e);
-					callback(e, hitTest(e, preventOverlap, intersect), intersect);
-				}
+				intersect = getIntersectRect(e);
+				callback(e, hitTest(e, preventOverlap, intersect), intersect);
 			}
 		}
 		

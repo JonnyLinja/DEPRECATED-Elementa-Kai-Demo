@@ -14,14 +14,16 @@ package worlds {
 		public function LoginWorld() {
 		}
 		
+		//		public static function connect(stage:Stage, gameid:String, connectionid:String, userid:String, auth:String, partnerId:String, callback:Function, errorhandler:Function = null):void{
 		override public function begin():void {
 			//Connect and join the room
 			PlayerIO.connect(
 				FP.stage,								//Referance to stage
-				Net.GAME_ID,								//Game id (Get your own at playerio.com. 1: Create user, 2:Goto admin pannel, 3:Create game, 4: Copy game id inside the "")
+				Net.GAME_ID,							//Game id (Get your own at playerio.com. 1: Create user, 2:Goto admin pannel, 3:Create game, 4: Copy game id inside the "")
 				"public",								//Connection id, default is public
 				"GuestUser",							//Username
 				"",										//User auth. Can be left blank if authentication is disabled on connection
+				"",										//Partner ID
 				handleConnect,							//Function executed on successful connect
 				handleError								//Function executed if we recive an error
 			);

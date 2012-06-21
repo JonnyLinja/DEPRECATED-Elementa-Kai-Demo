@@ -8,7 +8,7 @@ package networking {
 		public static var client:Client;
 		
 		//general constants
-		public static const GAME_ID:String = "avatar2-xj92cb1gyumlmd9mcge2xa";
+		public static const GAME_ID:String = "";
 		public static const GAME_TYPE:String = "ElementaKai";
 		public static const ROOM_LOBBY:String = "LOBBY";
 		
