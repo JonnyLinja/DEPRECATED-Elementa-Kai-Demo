@@ -1,9 +1,10 @@
 package physics {
-	import flashpunk.Rollbackable;
+	import net.flashpunk.Rollbackable;
+	import net.flashpunk.Destroyable;
 	
 	import general.Utils;
 	
-	public class ForceVector implements Rollbackable {
+	public class ForceVector implements Rollbackable, Destroyable {
 		public var max:Number; //max distance
 		public var x:ForceComponent = new ForceComponent();
 		public var y:ForceComponent = new ForceComponent();
@@ -49,7 +50,7 @@ package physics {
 		}
 		
 		public function applyMax():Boolean {
-			//determine if has max
+			//determine if can run
 			if (max <= 0)
 				return false;
 			
@@ -68,6 +69,7 @@ package physics {
 			x.velocity *= ratio;
 			y.velocity *= ratio;
 			
+			//true
 			return true;
 		}
 		
@@ -78,6 +80,11 @@ package physics {
 			//rollback components
 			x.rollback(f.x);
 			y.rollback(f.y);
+		}
+		
+		public function destroy():void {
+			x = null;
+			y = null;
 		}
 	}
 }

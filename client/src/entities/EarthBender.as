@@ -1,13 +1,5 @@
 package entities {
-	import flash.geom.Point;
-	
-	import flashpunk.graphics.Spritemap;
-	import flashpunk.FP;
-	import flashpunk.Entity;
-	
-	import moves.PrepareBoulderMove;
-	
-	import general.Utils;
+	import entities.Bender;
 	
 	public class EarthBender extends Bender {
 		//animations
@@ -19,19 +11,17 @@ package entities {
 		
 		//speed
 		private const MAX:Number = 6;
+		public var shouldHalveSpeed:Boolean = false;
 		
 		//size
 		private const W:uint = 23;
 		private const H:uint = 32;
 		
-		//should
-		public var shouldHalveSpeed:Boolean = false;
-		
 		//sprite
 		[Embed(source = '../../images/earthbender.PNG')]
 		private static const image:Class; 
 		
-		public function EarthBender(x:Number = 0, y:Number = 0) {
+		public function EarthBender(x:Number, y:Number) {
 			//super
 			super(x, y, image, W, H);
 			
@@ -45,91 +35,17 @@ package entities {
 			//max
 			moveForce.max = MAX;
 			
-			//overlap
-			preventBoulderOverlap = false;
-			
 			//animation
 			sprite_map.add(EarthBender.CREATE_DUST_ANIMATION, [1, 4, 7, 10], 33, true);
 			sprite_map.add(EarthBender.CREATE_BOULDER_ANIMATION, [4, 7, 10, 1], 8, true);
 		}
 		
-		override protected function resetShouldVariables():void {
-			super.resetShouldVariables();
+		override public function update():void {
+			//speed
 			shouldHalveSpeed = false;
-		}
-		
-		override protected function didCollideWithStillBoulder(e:Entity, hitTestResult:int, intersectSize:Point):void {
-			//declare variables
-			var isHorizontal:Boolean;
-			var toMove:Number;
 			
-			//add proper sides
-			if (hitTestResult == HIT_TOP) {
-				isHorizontal = false;
-				toMove = -intersectSize.y;
-			}else if (hitTestResult == HIT_BOTTOM) {
-				isHorizontal = false;
-				toMove = intersectSize.y;
-			}else if (hitTestResult == HIT_LEFT) {
-				isHorizontal = true;
-				toMove = -intersectSize.x;
-			}else if (hitTestResult == HIT_RIGHT) {
-				isHorizontal = true;
-				toMove = intersectSize.x;
-			}
-			
-			//recursive call
-			if (!shoveBoulder(e as Boulder, hitTestResult, toMove, isHorizontal)) {
-				collideShouldStop(hitTestResult);
-				
-				//prevent overlap
-				hitTest(e, true, intersectSize);
-			}else
-				shouldHalveSpeed = true;
-		}
-		
-		protected function shoveBoulder(boulder:Boulder, hitTestResult:int, toMove:Number, isHorizontal:Boolean):Boolean {
-			//if need to go through this
-			if (boulder.shoved)
-				return true;
-			
-			//off screen check, prevent shove
-			if ((isHorizontal && boulder.isOffScreenHorizontal()) || (!isHorizontal && boulder.isOffScreenVertical())) {
-				boulder.shoved = false;
-				return false;
-			}
-			
-			//set shoved
-			boulder.shoved = true;
-			
-			//declare variables
-			var list:Vector.<Boulder> = new Vector.<Boulder>;
-			
-			//get list
-			boulder.collideInto(Boulder.COLLISION_TYPE_BOULDER_STILL, boulder.x, boulder.y, list);
-			
-			//loop through list recursively
-			for each (var boulder2:Boulder in list) {
-				if (!boulder2.shoved) {
-					if (hitTestResult != boulder.hitTest(boulder2))
-						continue;
-					if (!shoveBoulder(boulder2, hitTestResult, toMove, isHorizontal)) {
-						boulder.shoved = false;
-						return false;
-					}
-				}
-			}
-			
-			//move boulders
-			if(isHorizontal)
-				boulder.shouldMoveX += toMove;
-			else
-				boulder.shouldMoveY += toMove;
-			
-			//reset
-			//boulder.shoved = false;
-			
-			return true;
+			//super
+			super.update();
 		}
 		
 		override protected function updateMovement():void {

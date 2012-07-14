@@ -1,31 +1,20 @@
 package entities {
-	import flash.geom.Point;
-	import flashpunk.Rollbackable;
-	import flashpunk.FP;
-	import flashpunk.Entity;
+	import net.flashpunk.Rollbackable;
+	import net.flashpunk.FP;
+	
+	import entities.SpriteMapEntity;
 	
 	import physics.ForceVector;
 	import physics.WindForce;
 	
-	import entities.SpriteMapEntity;
-	
-	import general.Utils;
-	
-	public class MovableEntity extends SpriteMapEntity {		
+	public class MovableEntity extends SpriteMapEntity {
 		//forces
 		public var moveForce:ForceVector = new ForceVector();
 		public var windForce:WindForce = new WindForce();
 		
-		//max
-		protected var reachedMax:Boolean = false;
-		
-		//overlap
-		protected var preventWallOverlap:Boolean = true;
-		
 		public function MovableEntity(x:Number = 0, y:Number = 0) {
-			//position
-			this.x = x;
-			this.y = y;
+			//super
+			super(x, y);
 		}
 		
 		public function isMovingUp():Boolean {
@@ -60,16 +49,6 @@ package entities {
 			return false;
 		}
 		
-		override public function preUpdate():void {
-			super.preUpdate();
-			
-			//wall
-			checkCollide(Wall.COLLISION_TYPE, preventWallOverlap, didCollideWithWall);
-		}
-		
-		protected function didCollideWithWall(e:Entity, hitTestResult:int, intersectSize:Point):void {
-		}
-		
 		override public function update():void {
 			super.update();
 			
@@ -87,12 +66,20 @@ package entities {
 			
 			//rollback forces
 			moveForce.rollback(e.moveForce);
+			windForce.rollback(e.windForce);
+		}
+		
+		override public function destroy():void {
+			//super
+			super.destroy();
 			
-			//rollback prevent
-			preventWallOverlap = e.preventWallOverlap;
+			//move force
+			moveForce.destroy();
+			moveForce = null;
 			
-			//rollback max
-			reachedMax = e.reachedMax;
+			//wind force
+			windForce.destroy();
+			windForce = null;
 		}
 	}
 }

@@ -1,5 +1,5 @@
 package physics {
-	import flashpunk.FP;
+	import net.flashpunk.FP;
 	
 	public class Formulas {
 		public function Formulas() {

@@ -1,5 +1,5 @@
 package physics {
-	import flashpunk.Rollbackable;
+	import net.flashpunk.Rollbackable;
 	
 	public class ForceComponent implements Rollbackable {
 		public var maxVelocity:Number=0;

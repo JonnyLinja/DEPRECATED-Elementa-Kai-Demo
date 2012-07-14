@@ -1,5 +1,5 @@
 package entities {
-	import flashpunk.RollbackableEntity;
+	import net.flashpunk.RollbackableEntity;
 	
 	public class Wall extends RollbackableEntity {
 		public static const COLLISION_TYPE:String = "wall";

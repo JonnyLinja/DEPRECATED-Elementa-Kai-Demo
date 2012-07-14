@@ -1,15 +1,12 @@
 package entities {
-	import flash.geom.Point;
-	import flashpunk.Rollbackable;
-	import physics.ForceVector;
-	import physics.ForceComponent;
+	import net.flashpunk.Rollbackable;
+	import net.flashpunk.RollbackableSpriteMap;
 	
-	import flashpunk.Entity;
-	import flashpunk.FP;
-	import flashpunk.graphics.Spritemap;
+	import entities.MovableEntity;
 	
 	import general.Utils;
-	import worlds.GameWorld;
+	
+	import physics.ForceComponent;
 	
 	public class Bender extends MovableEntity {
 		//animation constants
@@ -30,7 +27,10 @@ package entities {
 		
 		//mouse
 		public var mouseX:Number = 0;
-		public var mouseY:Number = 0
+		public var mouseY:Number = 0;
+		
+		//hp
+		public var hp:Number = 10;
 		
 		//forces
 		public var leftForce:ForceComponent = new ForceComponent();
@@ -38,23 +38,14 @@ package entities {
 		public var upForce:ForceComponent = new ForceComponent();
 		public var downForce:ForceComponent = new ForceComponent();
 		
-		//should
-		public var shouldStopLeft:Boolean;
-		public var shouldStopRight:Boolean;
-		public var shouldStopUp:Boolean;
-		public var shouldStopDown:Boolean;
-		
-		//overlap
-		protected var preventBoulderOverlap:Boolean = true;
-		
-		public function Bender(x:Number = 0, y:Number = 0, image:Class = null, iWidth:uint= 0, iHeight:uint = 0) {
+		public function Bender(x:Number, y:Number, image:Class = null, iWidth:uint= 0, iHeight:uint = 0) {
 			//super
 			super(x, y);
 			
 			//image
 			if (image) {
 				//sprite
-				sprite_map = new Spritemap(image, iWidth, iHeight);
+				sprite_map = new RollbackableSpriteMap(image, iWidth, iHeight);
 				
 				//animations
 				sprite_map.add(WALK_DOWN_ANIMATION, [0, 1, 2], 33, true);
@@ -64,86 +55,16 @@ package entities {
 				sprite_map.play(WALK_DOWN_ANIMATION);
 			}
 		}
-			
-		override public function preUpdate():void {
-			super.preUpdate();
-			
-			//collisions against benders
-			if(type != AirBender.COLLISION_TYPE)
-				checkCollide(AirBender.COLLISION_TYPE, true, didCollideWithBender);
-			if (type != EarthBender.COLLISION_TYPE)
-				checkCollide(EarthBender.COLLISION_TYPE, true, didCollideWithBender);
-			if (type != FireBender.COLLISION_TYPE)
-				checkCollide(FireBender.COLLISION_TYPE, true, didCollideWithBender);
-			if (type != WaterBender.COLLISION_TYPE)
-				checkCollide(WaterBender.COLLISION_TYPE, true, didCollideWithBender);
-			
-			//collisions against still boulders
-			checkCollide(Boulder.COLLISION_TYPE_BOULDER_STILL, preventBoulderOverlap, didCollideWithStillBoulder);
-		}
-		
-		override protected function resetShouldVariables():void {
-			super.resetShouldVariables();
-			
-			shouldStopLeft = false;
-			shouldStopRight = false;
-			shouldStopUp = false;
-			shouldStopDown = false;
-		}
-		
-		protected function collideShouldStop(hitTestResult:int):void {
-			if (hitTestResult == HIT_TOP)
-				shouldStopUp = true;
-			else if (hitTestResult == HIT_LEFT)
-				shouldStopLeft = true;
-			else if (hitTestResult == HIT_RIGHT)
-				shouldStopRight = true;
-			else if (hitTestResult == HIT_BOTTOM)
-				shouldStopDown = true;
-		}
-		
-		override protected function didCollideWithWall(e:Entity, hitTestResult:int, intersectSize:Point):void {
-			collideShouldStop(hitTestResult);
-		}
-		
-		protected function didCollideWithBender(e:Entity, hitTestResult:int, intersectSize:Point):void {
-			collideShouldStop(hitTestResult);
-		}
-		
-		protected function didCollideWithStillBoulder(e:Entity, hitTestResult:int, intersectSize:Point):void {
-			collideShouldStop(hitTestResult);
-		}
 		
 		override public function update():void {
+			//super
 			super.update();
-			updateMovement();
-			updateDirection();
-		}
-		
-		override protected function resolveShouldVariables():void {
-			super.resolveShouldVariables();
 			
-			//stop at edges
-			if (shouldStopLeft) {
-				leftForce.velocity = 0;
-				if (windForce.x < 0)
-					windForce.x = 0;
-			}
-			if (shouldStopRight) {
-				rightForce.velocity = 0;
-				if (windForce.x > 0)
-					windForce.x = 0;
-			}
-			if (shouldStopUp) {
-				upForce.velocity = 0;
-				if (windForce.y < 0)
-					windForce.y = 0;
-			}
-			if (shouldStopDown) {
-				downForce.velocity = 0;
-				if (windForce.y > 0)
-					windForce.y = 0;
-			}
+			//movement
+			updateMovement();
+			
+			//direction
+			updateDirection();
 		}
 		
 		protected function updateMovement():void {
@@ -234,6 +155,17 @@ package entities {
 			//mouse
 			mouseX = b.mouseX;
 			mouseY = b.mouseY;
+		}
+		
+		override public function destroy():void {
+			//super
+			super.destroy();
+			
+			//destroy
+			leftForce = null;
+			rightForce = null;
+			upForce = null;
+			downForce = null;
 		}
 	}
 }

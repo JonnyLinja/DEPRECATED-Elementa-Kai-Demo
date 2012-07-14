@@ -1,12 +1,13 @@
 package processors {
-	import flashpunk.Rollbackable;
+	import net.flashpunk.Rollbackable;
+	import net.flashpunk.rollback.GameWorld;
+	import net.flashpunk.rollback.Command;
+	import net.flashpunk.Destroyable;
 	
-	import commands.Command;
-	import commands.MouseCommand;
+	import general.CommandList;
 	
 	import moves.Move;
 	import entities.Bender;
-	import worlds.GameWorld;
 	
 	public class BenderProcessor implements Rollbackable {
 		//worlds and entities
@@ -19,11 +20,9 @@ package processors {
 		protected var a:Boolean = false;
 		protected var s:Boolean = false;
 		protected var d:Boolean = false;
-		protected var justToggledMouse:Boolean = false;
 		protected var click:Boolean = false;
-		protected var flick:Boolean = false;
 		
-		//mouse positions - meant for buffering perhaps?
+		//mouse positions
 		protected var mouseX:Number;
 		protected var mouseY:Number;
 		
@@ -53,38 +52,29 @@ package processors {
 				player.moveDown = false;
 			}
 			
+			//mouse
+			player.mouseX = mouseX;
+			player.mouseY = mouseY;
+			
 			//decrement buffer
 			if (frameBuffer > 0)
 				frameBuffer--;
-			
-			//reset just click
-			justToggledMouse = false;
 		}
 		
 		public function add(c:Command):void {
 			//movement
-			if (c.type == Command.A)
+			if (c.type == CommandList.A)
 				a = !a;
-			else if (c.type == Command.D)
+			else if (c.type == CommandList.D)
 				d = !d;
-			else if (c.type == Command.W)
+			else if (c.type == CommandList.W)
 				w = !w;
-			else if (c.type == Command.S)
+			else if (c.type == CommandList.S)
 				s = !s;
-			//mouse
-			else if (c is MouseCommand)
-				handleMouseCommand(c as MouseCommand);
-		}
-		
-		protected function handleMouseCommand(c:MouseCommand):void {
-			player.mouseX = c.x;
-			player.mouseY = c.y;
 			
-			if (c.type == MouseCommand.CLICK) {
-				click = !click;
-				justToggledMouse = true;
-			}else if (c.type == MouseCommand.FLICK)
-				flick = !flick;
+			//mouse
+			mouseX = c.x;
+			mouseY = c.y;
 		}
 		
 		public function rollback(orig:Rollbackable):void {
@@ -96,13 +86,16 @@ package processors {
 			s = p.s;
 			d = p.d;
 			w = p.w;
-			canMove = p.canMove;
-			justToggledMouse = p.justToggledMouse;
-			flick = p.flick;
-			click = p.click;
 			mouseX = p.mouseX;
 			mouseY = p.mouseY;
+			canMove = p.canMove;
 			frameBuffer = p.frameBuffer;
+		}
+		
+		public function destroy():void {
+			world = null;
+			player = null;
+			currentMove = null;
 		}
 	}
 }

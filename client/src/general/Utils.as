@@ -1,9 +1,4 @@
 package general {
-	import entities.MovableEntity;
-	import entities.AirBender;
-	import entities.EarthBender;
-	import entities.FireBender;
-	import entities.WaterBender;
 	
 	import flash.external.ExternalInterface;
 	import flash.geom.Point
@@ -24,19 +19,17 @@ package general {
 		 * @param	data
 		 */
 		public static function log(data:String):void {
-			//temporary - for logging purposes
-			ExternalInterface.call("log", data.toString());
-			//trace(data.toString());
+			try {
+				ExternalInterface.call("log", data);
+			}catch (e:*) {
+				trace(data);
+			}
 		}
 		
 		public static function swap(a:Object, b:Object):void {
 			var c:Object = a;
 			a = b;
 			b = c;
-		}
-		
-		public static function isBender(e:MovableEntity):Boolean {
-			return (e.type == WaterBender.COLLISION_TYPE || e.type == FireBender.COLLISION_TYPE || e.type == EarthBender.COLLISION_TYPE || e.type == AirBender.COLLISION_TYPE);
 		}
 		
 		public static function negative(n:Number):Number {
