@@ -90,6 +90,8 @@ package processors {
 			mouseY = p.mouseY;
 			canMove = p.canMove;
 			frameBuffer = p.frameBuffer;
+			
+			//note that currentMove is to be rolled back in subclasses
 		}
 		
 		public function destroy():void {

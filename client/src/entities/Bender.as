@@ -3,6 +3,7 @@ package entities {
 	import net.flashpunk.RollbackableSpriteMap;
 	
 	import entities.MovableEntity;
+	import entities.Wall;
 	
 	import general.Utils;
 	
@@ -59,6 +60,12 @@ package entities {
 		override public function update():void {
 			//super
 			super.update();
+			
+			//wall collision
+			var wall:Wall = collide(Wall.COLLISION_TYPE, x, y) as Wall;
+			if (wall) {
+				Utils.hitTest(this, wall, true, false);
+			}
 			
 			//movement
 			updateMovement();

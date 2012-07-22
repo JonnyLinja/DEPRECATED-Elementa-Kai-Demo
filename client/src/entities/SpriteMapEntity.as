@@ -12,6 +12,9 @@ package entities {
 			super(x, y);
 		}
 		
+		/**
+		 * Set
+		 */
 		public function set sprite_map(map:RollbackableSpriteMap):void {
 			//set map
 			_sprite_map = map;
@@ -20,14 +23,25 @@ package entities {
 			graphic = _sprite_map;
 		}
 		
+		/**
+		 * Get
+		 */
 		public function get sprite_map():RollbackableSpriteMap {
 			return _sprite_map;
 		}
 		
+		/**
+		 * Animation
+		 * @param	animationType
+		 */
 		public function play(animationType:String):void {
 			_sprite_map.play(animationType);
 		}
 		
+		/**
+		 * Rollback
+		 * @param	orig
+		 */
 		override public function rollback(orig:Rollbackable):void {
 			//super
 			super.rollback(orig);
@@ -39,6 +53,9 @@ package entities {
 			_sprite_map.rollback(s._sprite_map);
 		}
 		
+		/**
+		 * Memory Management
+		 */
 		override public function destroy():void {
 			//super
 			super.destroy();
